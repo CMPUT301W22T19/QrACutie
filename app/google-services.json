@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1081694048910",
+    "project_id": "qracutie-c85b2",
+    "storage_bucket": "qracutie-c85b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081694048910:android:1f15fdda29c39c44bdafdf",
+        "android_client_info": {
+          "package_name": "com.example.qracutie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081694048910-5el5uan1g5lq1oks6agdvbc92jkvur1g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpUeFlv9ql7uDShmi42ZYzy3l31ahVE-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081694048910-5el5uan1g5lq1oks6agdvbc92jkvur1g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
