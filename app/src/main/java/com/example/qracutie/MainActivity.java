@@ -37,7 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
+    }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
         loadData();
     }
 
@@ -104,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             generateUniqueUsername();
         }else{
             //Log.d("ENTERED","user exists");
-            //Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
             // user already exists in the database
         }
     }
