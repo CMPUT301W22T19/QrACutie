@@ -5,8 +5,10 @@ import static android.content.Context.MODE_PRIVATE;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        //sharedPreferences.edit().clear().commit();
+
         loadData();
     }
 
@@ -46,14 +51,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void isUniqueCheck(){
+
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
+                if(task.getResult().exists()){
                     // This is a duplicated username
                     generateUniqueUsername();
+                    //Log.d("ENTERED","duplicate user");
                 }else{
                     // create the user
+                    //Log.d("ENTERED","create user");
                     createNewUser();
                 }
             }
@@ -78,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     public void saveUser(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         if(sharedPreferences.getString(TEXT,"").equals(username) == false){
+            //Log.d("ENTERED", username);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(TEXT, username);
             editor.apply();
@@ -91,8 +100,11 @@ public class MainActivity extends AppCompatActivity {
         // if username isn't stored in shared preferences, then generate a username
         // Someone is opening our app for the first time
         if (username.equals("")){
+            //Log.d("ENTERED","generate user");
             generateUniqueUsername();
         }else{
+            //Log.d("ENTERED","user exists");
+            //Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
             // user already exists in the database
         }
     }
