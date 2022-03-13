@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.33" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/list_qr_code.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.279922279872806" />
       </map>
     </option>
