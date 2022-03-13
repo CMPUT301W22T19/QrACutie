@@ -9,4 +9,20 @@ public class GameQRCode {
     int amountOfScans; // ask for most unique method
 
     String[] CommentSection; //temp
+
+    /**
+     * return the point value associated with the QR code
+     * @return points
+     */
+    public int getPoints() {
+        return points;
+    }
+
+    /**
+     * returns the has associated with the QR code
+     * @return hash
+     */
+    public String getHash() {
+        return hash;
+    }
 }

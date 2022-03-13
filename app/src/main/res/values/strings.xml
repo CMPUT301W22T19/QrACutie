@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">QrACutie</string>
+    <string name="points">Points</string>
+    <string name="_0">0</string>
+    <string name="lowest_score">Lowest Score</string>
+    <string name="highest_score">Highest Score</string>
+    <string name="total_points">Total Points</string>
+    <string name="total_codes">Total Codes</string>
+    <string name="username">username</string>
 </resources>
