@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class Camera_ extends AppCompatActivity {
 
     private Button qrCodeFoundButton;
     private String qrCode;
+    private Button next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class Camera_ extends AppCompatActivity {
 
         previewView = findViewById(R.id.PeekView);
 
+        next = (Button) findViewById(R.id.nextbutton);
         qrCodeFoundButton = (Button) findViewById(R.id.qrCodeFoundButton);
         qrCodeFoundButton.setVisibility(View.INVISIBLE);
         qrCodeFoundButton.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +55,19 @@ public class Camera_ extends AppCompatActivity {
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         requestCamera();
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openNext();
+            }
+        });
+
+    }
+
+    private void openNext() {
+        Intent intent = new Intent(this, AfterCamera.class);
+        startActivity(intent);
     }
 
     private void requestCamera() {
