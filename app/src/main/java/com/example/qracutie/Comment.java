@@ -1,5 +1,11 @@
 package com.example.qracutie;
 
+/**
+ * Models a single comment on a saved QR Code. Stores the comment text, the user who posted it,
+ * and the date when it was posted
+ *
+ * Adapted in large parts from the MainActivity Class shown in CMPUT 301's labs
+ */
 public class Comment {
     private String commentString;
     private String uID;
@@ -11,11 +17,11 @@ public class Comment {
         this.date = date;
     }
 
-    String getCityName(){
+    String getCommentName(){
         return this.commentString;
     }
 
-    String getProvinceName(){
+    String getUserName(){
         return this.uID;
     }
 

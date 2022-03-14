@@ -12,17 +12,22 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
+/**
+ * A container for displaying each comment attached to a given QR code. Creates textviews for
+ * use in layout xml files. 
+ *
+ * Adapted in large parts from the MainActivity Class shown in CMPUT 301's labs
+ */
 public class CommentList extends ArrayAdapter<Comment> {
 
-    private ArrayList<Comment> cities;
+    private ArrayList<Comment> comments;
     private Context context;
 
-    public CommentList(Context context, ArrayList<Comment> cities){
-        super(context,0, cities);
-        this.cities = cities;
+    public CommentList(Context context, ArrayList<Comment> comments){
+        super(context,0, comments);
+        this.comments = comments;
         this.context = context;
     }
-
 
     @NonNull
     @Override
@@ -34,15 +39,14 @@ public class CommentList extends ArrayAdapter<Comment> {
             view = LayoutInflater.from(context).inflate(R.layout.content, parent,false);
         }
 
-        Comment city = cities.get(position);
+        Comment comment = comments.get(position);
 
-        TextView cityName = view.findViewById(R.id.comment_text);
-        TextView provinceName = view.findViewById(R.id.uid_text);
+        TextView commentName = view.findViewById(R.id.comment_text);
+        TextView userName = view.findViewById(R.id.uid_text);
 
-        cityName.setText(city.getCityName());
-        provinceName.setText(city.getProvinceName());
+        commentName.setText(comment.getCommentName());
+        userName.setText(comment.getUserName());
 
         return view;
-
     }
 }

@@ -35,6 +35,16 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Class to model a Comments Page Activity. This activity will be called when a user clicks on
+ * a QR Code entry in their own or another player's QR codes page. It will open a (stock) image
+ * of a QR Code and the comments currently attached to the QR Code.
+ *
+ * The Activity also opens a text input box and 'ADD COMMENT' button at the bottom at the activity
+ * for adding new comments
+ *
+ * Adapted in large parts from the MainActivity Class shown in CMPUT 301's Lab 5
+ */
 public class CommentsPage extends AppCompatActivity {
 
     // Declare the variables so that you will be able to reference it later.
@@ -62,32 +72,16 @@ public class CommentsPage extends AppCompatActivity {
 
         commentList = findViewById(R.id.comment_list);
 
+        // get comments objects
         addCommentButton = findViewById(R.id.add_comment_button);
         addCommentEditText = findViewById(R.id.add_comment_field);
-
-        String []commentText ={"Wow this QR code is so pretty", "Almost as pretty as me", "WTF", "You heard me", "I did not", "Text carries no sound"};
-        String []userID = {"batiuk", "batiuk", "hindle", "batiuk", "hindle", "hindle"};
-        String []timeStamp = {"1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21"};
-
         commentDataList = new ArrayList<>();
 
-        for(int i=0;i<commentText.length;i++){
-            commentDataList.add((new Comment(commentText[i], userID[i], timeStamp[i])));
-        }
-
+        // construct adapter
         commentAdapter = new CommentList(this, commentDataList);
-
-
-
-
-
-
         commentList.setAdapter(commentAdapter);
 
-
-
-
-
+        // Wait for 'Add Comment' button to be clicked and add input to database
         addCommentButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,11 +89,8 @@ public class CommentsPage extends AppCompatActivity {
                 // Retrieving the comment name and the province name from the EditText fields
                 final String commentText = addCommentEditText.getText().toString();
 
-
-
                 // TEMP
                 final String userName = "batiuk";
-
 
                 // https://stackoverflow.com/questions/8654990/how-can-i-get-current-date-in-android
                 Date c = Calendar.getInstance().getTime();
@@ -117,7 +108,6 @@ public class CommentsPage extends AppCompatActivity {
                     data.put("date", formattedDate);
                     data.put("text", commentText);
                     data.put("uid", userName);
-
                 }
 
                 // The set method sets a unique id for the document
@@ -145,6 +135,7 @@ public class CommentsPage extends AppCompatActivity {
             }
         });
 
+        // Grab data from database and populate into activity
         collectionReference.orderBy("date").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
