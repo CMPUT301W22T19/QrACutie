@@ -45,6 +45,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Retrieves player location and shows Qr Codes within a certain range
+ *
+ * Code for accessing location, asking for permissions, and onLocationChange listener have been used from -
+ * https://github.com/mohsinulkabir14/An-Android-Application-to-Show-Your-Position-On-The-Map-Using-Google-Maps-API/blob/master/app/src/main/java/com/example/maplocation/MapsActivity.java
+ *
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -70,6 +77,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        /* Everything underneath this section is referenced from
+        https://github.com/mohsinulkabir14/An-Android-Application-to-Show-Your-Position-On-The-Map-Using-Google-Maps-API/blob/master/app/src/main/java/com/example/maplocation/MapsActivity.java
+        */
 
         /* Location Manager use either the Network provider or GPS provider of the android device to fetch the location
         latitude or longitude of the user */
@@ -204,6 +215,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * This function uses the latitude and longitude from 2 locations to determine their distance
      * and returns that distance as a double
+     *
+     * The following function was obtained from the answer of this stackoverflow question
+     * https://stackoverflow.com/questions/49839437/how-to-show-markers-only-inside-of-radius-circle-on-maps
      * @param LAT1 Location 1 Latitude
      * @param LONG1 Location 1 Longitude
      * @param LAT2 Location 2 Latitude
