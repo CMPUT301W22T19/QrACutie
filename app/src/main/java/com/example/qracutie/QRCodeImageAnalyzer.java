@@ -1,3 +1,7 @@
+/*
+This class was built upon code found at https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
+ */
+
 package com.example.qracutie;
 
 import androidx.annotation.NonNull;
