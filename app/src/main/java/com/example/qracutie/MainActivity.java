@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button button1 = (Button)findViewById(R.id.cameraButton);
         button1.setOnClickListener(view -> {
-            Intent intent = new Intent(view.getContext(),Camera_.class);
+            Intent intent = new Intent(view.getContext(), com.example.qracutie.Camera_.class);
             view.getContext().startActivity(intent);});
     }
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);

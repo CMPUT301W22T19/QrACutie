@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firestore.v1.WriteResult;
 
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -59,18 +60,16 @@ public class Camera_ extends AppCompatActivity {
         qrCodeFoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
-                DocumentReference collectionReference = db.collection("GameQRCodes").document(qrCode);
-                Map<String, Object> data = new HashMap<>();
-                data.put("hash", qrCode);
-                Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + qrCode);
+                String hash = sha256(qrCode);
+                Toast.makeText(getApplicationContext(), hash, Toast.LENGTH_SHORT).show();
+                Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + hash);
             }
         });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         requestCamera();
     }
+
 
     private void requestCamera() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -81,6 +80,23 @@ public class Camera_ extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
             }
+        }
+    }
+    // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
+    public static String sha256(final String base) {
+        try{
+            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            final byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            final StringBuilder hexString = new StringBuilder();
+            for (int i = 0; i < hash.length; i++) {
+                final String hex = Integer.toHexString(0xff & hash[i]);
+                if(hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch(Exception ex){
+            throw new RuntimeException(ex);
         }
     }
 
@@ -108,7 +124,7 @@ public class Camera_ extends AppCompatActivity {
     }
 
     private void bindCameraPreview(@NonNull ProcessCameraProvider cameraProvider) {
-        previewView.setImplementationMode(PreviewView.ImplementationMode.PERFORMANCE);
+        previewView.setPreferredImplementationMode(PreviewView.ImplementationMode.SURFACE_VIEW);
 
         Preview preview = new Preview.Builder()
                 .build();
@@ -117,7 +133,7 @@ public class Camera_ extends AppCompatActivity {
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
 
-        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+        preview.setSurfaceProvider(previewView.createSurfaceProvider());
 
         ImageAnalysis imageAnalysis =
                 new ImageAnalysis.Builder()
