@@ -12,7 +12,8 @@
         android:id="@+id/uid_text"
         android:textSize="15sp"
         android:layout_marginLeft="15dp"
-        android:text="UID">
+        android:text="UID"
+        android:textColor="#FFFFFF">
     </TextView>
 
     <TextView
