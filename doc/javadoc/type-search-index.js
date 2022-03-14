@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.example.qracutie","l":"GameQRCode"},{"p":"com.example.qracutie","l":"GameQRCodeAdapter"},{"p":"com.example.qracutie","l":"MainActivity"},{"p":"com.example.qracutie","l":"Player"},{"p":"com.example.qracutie","l":"PlayerCollectionActivity"}]
