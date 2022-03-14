@@ -7,23 +7,22 @@
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/city_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:text="City"
-        android:textSize="30sp">
+        android:id="@+id/uid_text"
+        android:textSize="15sp"
+        android:layout_marginLeft="15dp"
+        android:text="UID">
     </TextView>
 
     <TextView
+        android:id="@+id/comment_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/province_text"
-        android:textSize="30sp"
-        android:layout_marginLeft="20dp"
-        android:text="Province">
+        android:padding="20dp"
+        android:text="Comment"
+        android:textSize="15sp">
     </TextView>
-
 
 </LinearLayout>
 

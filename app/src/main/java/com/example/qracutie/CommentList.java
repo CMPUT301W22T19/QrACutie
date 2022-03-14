@@ -36,8 +36,8 @@ public class CommentList extends ArrayAdapter<Comment> {
 
         Comment city = cities.get(position);
 
-        TextView cityName = view.findViewById(R.id.city_text);
-        TextView provinceName = view.findViewById(R.id.province_text);
+        TextView cityName = view.findViewById(R.id.comment_text);
+        TextView provinceName = view.findViewById(R.id.uid_text);
 
         cityName.setText(city.getCityName());
         provinceName.setText(city.getProvinceName());
