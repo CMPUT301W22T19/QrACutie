@@ -1,5 +1,14 @@
 package com.example.qracutie;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.util.Size;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
@@ -12,20 +21,22 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.util.Size;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
-
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firestore.v1.WriteResult;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class Camera_ extends AppCompatActivity {
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT = "username";
+
     private static final int PERMISSION_REQUEST_CAMERA = 0;
     private PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
@@ -38,6 +49,9 @@ public class Camera_ extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Get a top level reference to the collection
+
         previewView = findViewById(R.id.PeekView);
 
         qrCodeFoundButton = (Button) findViewById(R.id.qrCodeFoundButton);
@@ -45,7 +59,11 @@ public class Camera_ extends AppCompatActivity {
         qrCodeFoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
+                DocumentReference collectionReference = db.collection("GameQRCodes").document(qrCode);
+                Map<String, Object> data = new HashMap<>();
+                data.put("hash", qrCode);
                 Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + qrCode);
             }
         });
