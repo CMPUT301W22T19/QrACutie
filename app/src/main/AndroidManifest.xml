@@ -27,6 +27,7 @@
             android:name=".CommentsPage"
             android:label="CommentsPage"
             android:exported="true" />
+        <activity android:name=".Account"></activity>
     </application>
 
 </manifest>
