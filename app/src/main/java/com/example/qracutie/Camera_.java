@@ -127,10 +127,9 @@ public class Camera_ extends AppCompatActivity {
                 int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
                 ByteBuffer buffer = imageProxy.getPlanes()[0].getBuffer();
                 // insert your code here.
-                InputImage image = InputImage.fromByteBuffer(buffer,imageProxy.getWidth(),imageProxy.getHeight(),
-                        rotationDegrees,
-                        InputImage.IMAGE_FORMAT_NV21 // or IMAGE_FORMAT_YV12
-                );
+
+                InputImage image = InputImage.fromByteBuffer(buffer,imageProxy.getWidth(),imageProxy.getHeight(), rotationDegrees, InputImage.IMAGE_FORMAT_BITMAP );
+
                 BarcodeScanner scanner = BarcodeScanning.getClient();
                 Task<List<Barcode>> result = scanner.process(image)
                         .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
