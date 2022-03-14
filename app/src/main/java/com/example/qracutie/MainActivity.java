@@ -108,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
             nameDisplayed.setText(username);
             player = new Player(username);
             getPlayerInfo();
+            // From: Youtube
+            // URL: https://www.youtube.com/watch?v=xzCsJF9WtPU&ab_channel=EasyLearn
+            // Author: EasyLearn
             StorageReference ref = storageReference.child(username+".jpeg");
             try {
                 final File localFile = File.createTempFile(username, ".jeg");
@@ -158,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void uploadProfileImage(Bitmap bitmap){
+        // From: Youtube
+        // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
+        // Author: yoursTruly
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
