@@ -72,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    uri = result.getData().getData();
-                    profile_image_uri = uri.toString(); //added now
-                    draw_profile_image();
-                    uploadProfileImage(bitmap);
+                    if(result.getData() != null){
+                        uri = result.getData().getData();
+                        profile_image_uri = uri.toString(); //added now
+                        draw_profile_image();
+                        uploadProfileImage(bitmap);
+                    }
                 }
             }
     );
