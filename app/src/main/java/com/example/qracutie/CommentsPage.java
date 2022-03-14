@@ -25,9 +25,8 @@ public class CommentsPage extends AppCompatActivity {
     ArrayList<Comment> cityDataList;
 
     final String TAG = "Sample";
-    Button addCityButton;
-    EditText addCityEditText;
-    EditText addProvinceEditText;
+    Button addCommentButton;
+    EditText addCommentEditText;
     FirebaseFirestore db;
 
     CommentList customList;
@@ -37,21 +36,14 @@ public class CommentsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
 
-        cityList = findViewById(R.id.city_list);
+        cityList = findViewById(R.id.comment_list);
 
-
-
-
-        addCityButton = findViewById(R.id.add_city_button);
-        addCityEditText = findViewById(R.id.add_city_field);
-        addProvinceEditText = findViewById(R.id.add_province_edit_text);
-
-
+        addCommentButton = findViewById(R.id.add_comment_button);
+        addCommentEditText = findViewById(R.id.add_comment_field);
 
         String []commentText ={"Wow this QR code is so pretty", "Almost as pretty as me", "WTF", "You heard me", "I did not", "Text carries no sound"};
         String []userID = {"batiuk", "batiuk", "hindle", "batiuk", "hindle", "hindle"};
         String []timeStamp = {"1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21", "1988-03-21"};
-
 
         cityDataList = new ArrayList<>();
 
@@ -60,36 +52,23 @@ public class CommentsPage extends AppCompatActivity {
         }
 
         cityAdapter = new CommentList(this, cityDataList);
-
         cityList.setAdapter(cityAdapter);
 
-//        dataList = new ArrayList<>();
-//        dataList.addAll(Arrays.asList(cities));
-//
-//        cityAdapter = new ArrayAdapter<>(this, R.layout.content, dataList);
-//
-//        cityList.setAdapter(cityAdapter);
-
-
-        addCityButton.setOnClickListener( new View.OnClickListener() {
-
-
-            // Retrieving the city name and the province name from the EditText fields
-            final String cityName = addCityEditText.getText().toString();
-            final String provinceName = addProvinceEditText.getText().toString();
-
-            HashMap<String, String> data = new HashMap<>();
-
-            if (cityName.length() > 0 && provinceName.length() > 0) {
-
-
-                // If there’s some data in the EditText field, then we create a new key-value pair.
-                data.put("Province Name", provinceName);
-
-            }
-
+        addCommentButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // Retrieving the city name and the province name from the EditText fields
+                final String cityName = addCommentEditText.getText().toString();
+                final String provinceName = addCommentEditText.getText().toString();
+
+                HashMap<String, String> data = new HashMap<>();
+
+                if (cityName.length() > 0 && provinceName.length() > 0) {
+
+                    // If there’s some data in the EditText field, then we create a new key-value pair.
+                    data.put("Province Name", provinceName);
+                }
             }
         });
     }
