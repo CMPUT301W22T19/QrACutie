@@ -2,6 +2,7 @@ package com.example.qracutie;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -74,6 +75,10 @@ public class PlayerCollectionActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 viewQRCode(qrCodeDataList.get(i));
+
+
+                //Intent intent = new Intent(this, SecondActivity.class);
+                //startActivity(intent);
             }
         });
     }
