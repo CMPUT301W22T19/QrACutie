@@ -7,18 +7,24 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.Toast;
+import android.widget.Button;
 import android.os.Environment;
 
 import android.provider.MediaStore;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,7 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-
 
 public class MainActivity extends AppCompatActivity {
     private Button userAccountButton;
@@ -82,11 +87,24 @@ public class MainActivity extends AppCompatActivity {
             }
     );
 
+    ImageButton mapButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        //sharedPreferences.edit().clear().commit();
+
+        mapButton = (ImageButton)findViewById(R.id.mapButton);
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), MapsActivity.class);
+                startActivity(intent);
+            }
+        });
         userAccountButton = (Button) findViewById(R.id.user_account_button);
         nameDisplayed = (TextView) findViewById(R.id.display_name);
 
@@ -98,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
                 getProfileFromGallery();
             }
         });
+
+        Button button1 = (Button)findViewById(R.id.cameraButton);
+        button1.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(), CameraActivity.class);
+            view.getContext().startActivity(intent);});
 
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
@@ -150,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        //sharedPreferences.edit().clear().commit();
+        sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        sharedPreferences.edit().clear().commit();
     }
 
     private void draw_profile_image(){
@@ -294,5 +317,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }

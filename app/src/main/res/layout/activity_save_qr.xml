@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_save_qr"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient1">
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="160dp"
+        android:layout_height="41dp"
+        android:layout_gravity="center"
+        android:text="QR Score:"
+        android:textColor="#edeff7"
+        android:textSize="20sp" />
+
+    <CheckBox
+        android:id="@+id/location"
+        android:layout_width="141dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="onCheckboxClicked"
+        android:text="Save Location"
+        android:textColor="#edeff7"
+        android:textSize="15sp" />
+    <Button
+        android:id="@+id/CapturePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Capture">
+    </Button>
+
+    <Button
+        android:id="@+id/done_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Done"></Button>
+
+
+</LinearLayout>

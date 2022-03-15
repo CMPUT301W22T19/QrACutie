@@ -30,15 +30,10 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         Player player = new Player("Austinstestplayer1"); // TODO remove ....
         Bitmap defaultPic = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_profile_pic);
         player.setProfilePic(defaultPic);
-        GameQRCode testCode1 = new GameQRCode();
-        testCode1.hash = "TestCode1Hash";
-        testCode1.points = 20;
-        GameQRCode testCode2 = new GameQRCode();
-        testCode2.hash = "TestCode2Hash";
-        testCode2.points = 50;
-        GameQRCode testCode3 = new GameQRCode();
-        testCode3.hash = "TestCode3Hash";
-        testCode3.points = 10;
+        GameQRCode testCode1 = new GameQRCode("TestCode1Hash", 20);
+        GameQRCode testCode2 = new GameQRCode("TestCode2Hash", 50);
+        GameQRCode testCode3 = new GameQRCode("TestCode3Hash", 10);
+
         player.addGameQRCode(testCode1, null);
         player.addGameQRCode(testCode2, null);
         player.addGameQRCode(testCode3, null); // TODO remove ^
