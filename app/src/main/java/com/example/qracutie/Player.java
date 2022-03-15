@@ -1,5 +1,4 @@
 package com.example.qracutie;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -8,15 +7,11 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Player {
-    /*
-    String playerQRCode;
-    String userName;
-    String email;
-    String phoneNumber;
-     */
-
-    String username; // unique alphanumeric identifier
-    Bitmap profilePic;; // profile picture of user
+    String username = ""; // unique alphanumeric identifier
+    String email = "";
+    String phoneNumber = "";
+    String profileImage = "";
+    Bitmap profilePic; // profile picture of user
 
     ArrayList<GameQRCode> gameQRCodes = new ArrayList<>(); // all qrCodes belonging to the player
     int highestQRCode = 0; // highest pointed QR code belonging to the player
@@ -37,6 +32,7 @@ public class Player {
      * returns username associated with Player
      * @return username
      */
+
     public String getUsername() {
         return username;
     }
@@ -47,6 +43,30 @@ public class Player {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     /**
@@ -61,7 +81,7 @@ public class Player {
      * updates profile picture associated with player
      * @param profilePic
      */
-    public void setProfilePic(Bitmap profilePic) {
+    public void setProfilePic(Bitmap profilePic){
         this.profilePic = profilePic;
     }
 
@@ -72,7 +92,7 @@ public class Player {
      * @param qrCode a QR code to belong to the player
      * @param image an image to associate to the QR code, or null
      */
-    public void addGameQRCode(GameQRCode qrCode, Bitmap image) {
+    public void addGameQRCode (GameQRCode qrCode, Bitmap image){
 
         int points = qrCode.getPoints();
 
@@ -97,7 +117,7 @@ public class Player {
      * QR code, lowest scoring QR code, and point total accordingly
      * @param qrCode a QR code to delete from user collection
      */
-    public void deleteGameQRCode(GameQRCode qrCode) {
+    public void deleteGameQRCode (GameQRCode qrCode){
         // if array list does not contain qr code, throw an error
         if (!gameQRCodes.contains(qrCode)) {
             throw new IllegalArgumentException("QR Code is not owned by player");
@@ -126,7 +146,7 @@ public class Player {
      * returns all GameQRCode objects which belong to the Player's collection.
      * @return GameQRCodes
      */
-    public ArrayList<GameQRCode> getGameQRCodes() {
+    public ArrayList<GameQRCode> getGameQRCodes () {
         return gameQRCodes;
     }
 
@@ -134,7 +154,7 @@ public class Player {
      * returns a hashmap of Bitmap images associated with a game QR code
      * @return hashmap
      */
-    public HashMap<String, Bitmap> getGameQRCodeImages() {
+    public HashMap<String, Bitmap> getGameQRCodeImages () {
         return gameQRCodeImages;
     }
 
@@ -144,7 +164,7 @@ public class Player {
      *
      * @return highest point QR code, or 0 if no codes belong to player
      */
-    public int getHighestQRCode() {
+    public int getHighestQRCode () {
         return highestQRCode;
     }
 
@@ -154,7 +174,7 @@ public class Player {
      *
      * @return highest point QR code, or 0 if no codes belong to player
      */
-    public int getLowestQRCode() {
+    public int getLowestQRCode () {
         if (lowestQRCode == Integer.MAX_VALUE) {
             return 0;
         }
@@ -167,7 +187,7 @@ public class Player {
      *
      * @return highest point QR code, or 0 if no codes belong to player
      */
-    public int getPointTotal() {
+    public int getPointTotal () {
         return pointTotal;
     }
 
@@ -175,7 +195,7 @@ public class Player {
      * returns a count of the total number of GameQRCodes wihtin the collection
      * @return count of GameQRCodes
      */
-    public int getTotalCodes() {
+    public int getTotalCodes () {
         return gameQRCodes.size();
     }
 }
