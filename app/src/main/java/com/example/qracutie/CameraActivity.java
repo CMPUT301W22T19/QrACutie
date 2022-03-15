@@ -22,18 +22,12 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firestore.v1.WriteResult;
 
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class Camera_ extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String TEXT = "username";
@@ -70,13 +64,55 @@ public class Camera_ extends AppCompatActivity {
         requestCamera();
     }
 
+    private int hex2int(char ch)
+    {
+        if (ch >= '0' && ch <= '9')
+            return ch - '0';
+        if (ch >= 'A' && ch <= 'F')
+            return ch - 'A' + 10;
+        if (ch >= 'a' && ch <= 'f')
+            return ch - 'a' + 10;
+        return -1;
+    }
+
+    private int computeHashScore(String hash) {
+        int points = 0;
+        int indexIncrement = 0;
+        char currChar;
+        char nextChar;
+        int repeatCounter = 0;
+        for(int i = 0; i < hash.length();i++){
+            currChar = hash.charAt(i);
+            Boolean check = true;
+            indexIncrement = i+1;
+            while(check) {
+                nextChar = '/';
+                if(indexIncrement < hash.length()){
+                    nextChar = hash.charAt(indexIncrement);
+                }
+                if(nextChar == currChar){
+                    indexIncrement++;
+                    repeatCounter++;
+                    continue;
+                }
+                if(repeatCounter > 0){
+                    int baseValue = hex2int(currChar);
+                    points += (int) Math.pow(baseValue, repeatCounter);
+                    repeatCounter = 0;
+                    i = indexIncrement;
+                }
+                check = false;
+            }
+        }
+        return points;
+    }
 
     private void requestCamera() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startCamera();
         } else {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                ActivityCompat.requestPermissions(Camera_.this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
+                ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
             }
