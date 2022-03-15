@@ -3,9 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.24895833333333334" />
-        <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.24895833333333334" />
-        <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/after_scanning_qr_code.xml" value="0.2" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.252" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/border.xml" value="0.252" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/camera.xml" value="0.252" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/gradient1.xml" value="0.209" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/ic_baseline_filter_tilt_shift_24.xml" value="0.225" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/ic_baseline_photo_camera_24.xml" value="0.252" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/drawable/ic_launcher_background.xml" value="0.252" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.20202020202020202" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/activity_save_qr.xml" value="0.33229166666666665" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/camerapreview.xml" value="0.21822916666666667" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/fragment_firebase.xml" value="0.3140625" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/fragment_save_q_r_code.xml" value="0.3463541666666667" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.28177083333333336" />
+        <entry key="..\:/Users/Avnish Jadhav/Documents/UofA/Year 3/Winter 2022/CMPUT 301/QrACutie/app/src/main/res/layout/qrsave.xml" value="0.3463541666666667" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.33" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/list_qr_code.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.279922279872806" />
       </map>
     </option>

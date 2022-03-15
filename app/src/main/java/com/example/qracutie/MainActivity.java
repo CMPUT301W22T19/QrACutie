@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button1 = (Button)findViewById(R.id.cameraButton);
-        button1.setOnClickListener(view -> {
-            Intent intent = new Intent(view.getContext(),Camera_.class);
-            view.getContext().startActivity(intent);});
+//        Button button1 = (Button)findViewById(R.id.cameraButton);
+//        button1.setOnClickListener(view -> {
+//            Intent intent = new Intent(view.getContext(),Camera_.class);
+//            view.getContext().startActivity(intent);});
     }
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
