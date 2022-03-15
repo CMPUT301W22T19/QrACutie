@@ -23,6 +23,7 @@
     </queries>
     <application
         android:allowBackup="true"
+        android:exported="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -56,6 +57,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".CommentsPage"
+            android:label="CommentsPage"
+            android:exported="true" />
         <activity android:name=".Account"></activity>
     </application>
 

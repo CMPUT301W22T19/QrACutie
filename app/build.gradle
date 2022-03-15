@@ -32,6 +32,10 @@ android {
     }
 }
 
+task wrapper(type: Wrapper){
+    gradleVersion = '8.0'
+}
+
 task javadoc(type: Javadoc) {
 
     doFirst {
