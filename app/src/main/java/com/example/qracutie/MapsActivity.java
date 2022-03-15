@@ -2,6 +2,7 @@ package com.example.qracutie;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -10,6 +11,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -20,6 +22,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -64,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Circle circle;
     HashMap<String, GameQRCode> qrCodes = new HashMap<>();
     HashMap<String, MarkerOptions> markersOnMap = new HashMap<>();
+    Button backButton;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -77,6 +81,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        backButton = findViewById(R.id.back);
+        backButton.setOnClickListener(view -> {
+            Intent intentMain = new Intent(this, MainActivity.class);
+            startActivity(intentMain);
+        });
 
         /* Everything underneath this section is referenced from
         https://github.com/mohsinulkabir14/An-Android-Application-to-Show-Your-Position-On-The-Map-Using-Google-Maps-API/blob/master/app/src/main/java/com/example/maplocation/MapsActivity.java

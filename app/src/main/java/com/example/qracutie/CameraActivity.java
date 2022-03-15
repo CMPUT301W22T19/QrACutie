@@ -1,6 +1,7 @@
 package com.example.qracutie;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,11 +28,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
 
+
 public class CameraActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String TEXT = "username";
-
     private static final int PERMISSION_REQUEST_CAMERA = 0;
     private PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
@@ -54,57 +55,16 @@ public class CameraActivity extends AppCompatActivity {
         qrCodeFoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String hash = sha256(qrCode);
-                Toast.makeText(getApplicationContext(), hash, Toast.LENGTH_SHORT).show();
-                Log.i(MainActivity.class.getSimpleName(), "QR Code Found: " + hash);
+                //String hash = sha256(qrCode);
+                Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(v.getContext(), SaveQR.class);
+                intent.putExtra("qrcode", qrCode);
+                v.getContext().startActivity(intent);
             }
         });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         requestCamera();
-    }
-
-    private int hex2int(char ch)
-    {
-        if (ch >= '0' && ch <= '9')
-            return ch - '0';
-        if (ch >= 'A' && ch <= 'F')
-            return ch - 'A' + 10;
-        if (ch >= 'a' && ch <= 'f')
-            return ch - 'a' + 10;
-        return -1;
-    }
-
-    private int computeHashScore(String hash) {
-        int points = 0;
-        int indexIncrement = 0;
-        char currChar;
-        char nextChar;
-        int repeatCounter = 0;
-        for(int i = 0; i < hash.length();i++){
-            currChar = hash.charAt(i);
-            Boolean check = true;
-            indexIncrement = i+1;
-            while(check) {
-                nextChar = '/';
-                if(indexIncrement < hash.length()){
-                    nextChar = hash.charAt(indexIncrement);
-                }
-                if(nextChar == currChar){
-                    indexIncrement++;
-                    repeatCounter++;
-                    continue;
-                }
-                if(repeatCounter > 0){
-                    int baseValue = hex2int(currChar);
-                    points += (int) Math.pow(baseValue, repeatCounter);
-                    repeatCounter = 0;
-                    i = indexIncrement;
-                }
-                check = false;
-            }
-        }
-        return points;
     }
 
     private void requestCamera() {
@@ -116,23 +76,6 @@ public class CameraActivity extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
             }
-        }
-    }
-    // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
-    public static String sha256(final String base) {
-        try{
-            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            final byte[] hash = digest.digest(base.getBytes("UTF-8"));
-            final StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < hash.length; i++) {
-                final String hex = Integer.toHexString(0xff & hash[i]);
-                if(hex.length() == 1)
-                    hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch(Exception ex){
-            throw new RuntimeException(ex);
         }
     }
 

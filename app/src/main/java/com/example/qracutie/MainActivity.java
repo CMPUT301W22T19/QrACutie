@@ -173,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        // sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        // sharedPreferences.edit().clear().commit();
+        sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        sharedPreferences.edit().clear().commit();
     }
 
     private void draw_profile_image(){
