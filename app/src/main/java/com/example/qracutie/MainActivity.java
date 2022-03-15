@@ -86,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
     );
-    public String username;
-    public Player player;
+
     ImageButton mapButton;
 
     @Override
