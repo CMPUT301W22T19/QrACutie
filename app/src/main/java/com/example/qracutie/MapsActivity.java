@@ -232,7 +232,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void addBarcodeMarker(GameQRCode qrCodes) {
         LatLng qrLocation = new LatLng(qrCodes.getLatitude(), qrCodes.getLongitude());
         MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCodes.getPoints());
-
+        double distance = getDistance(marker.getPosition().latitude, marker.getPosition().longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
+        if (distance > 250) {
+            marker.visible(false);
+        }
+        else{
+            marker.visible(true);
+        }
         int height = 100;
         int width = 100;
         int barcode_icon = R.drawable.stock_barcode_icon;
