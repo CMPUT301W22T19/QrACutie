@@ -19,6 +19,14 @@ import static android.graphics.ImageFormat.YUV_420_888;
 import static android.graphics.ImageFormat.YUV_422_888;
 import static android.graphics.ImageFormat.YUV_444_888;
 
+/**
+ * Analyzes the image of the QR and extracts the data from it
+ *
+ * This entire class was implemented using -
+ * From: Learn To Android
+ * URL:https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
+ * Author:Jarrod Lilkendey
+ */
 public class QRCodeImageAnalyzer implements ImageAnalysis.Analyzer {
     private final QRCodeFoundListener listener;
 
