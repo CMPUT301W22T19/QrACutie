@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -64,11 +65,17 @@ public class CommentsPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
 
+        // get intent from caller class
+        Intent intent = getIntent();
+        String username = intent.getStringExtra(PlayerCollectionActivity.EXTRA_COMMENTS_USERNAME);
+        String qrCodeHash = intent.getStringExtra(PlayerCollectionActivity.EXTRA_COMMENTS_QRCODE);
+
         // Access a Cloud Firestore instance from your Activity
         db = FirebaseFirestore.getInstance();
 
         // Get a top level reference to the collection
-        final CollectionReference collectionReference = db.collection("GameQRCodes/11/comments/");
+        String commentCollectionPath = "GameQRCodes/" + qrCodeHash + "/comments/";
+        final CollectionReference collectionReference = db.collection(commentCollectionPath);
 
         commentList = findViewById(R.id.comment_list);
 
@@ -89,9 +96,6 @@ public class CommentsPage extends AppCompatActivity {
                 // Retrieving the comment name and the province name from the EditText fields
                 final String commentText = addCommentEditText.getText().toString();
 
-                // TEMP
-                final String userName = "batiuk";
-
                 // https://stackoverflow.com/questions/8654990/how-can-i-get-current-date-in-android
                 Date c = Calendar.getInstance().getTime();
                 System.out.println("Current time => " + c);
@@ -102,12 +106,12 @@ public class CommentsPage extends AppCompatActivity {
                 // https://cloud.google.com/firestore/docs/manage-data/add-data#javaandroid
                 Map<String, Object> data = new HashMap<>();
 
-                if (commentText.length() > 0 && userName.length() > 0) {
+                if (commentText.length() > 0 && username.length() > 0) {
 
                     // If there’s some data in the EditText field, then we create a new key-value pair.
                     data.put("date", formattedDate);
                     data.put("text", commentText);
-                    data.put("uid", userName);
+                    data.put("uid", username);
                 }
 
                 // The set method sets a unique id for the document
