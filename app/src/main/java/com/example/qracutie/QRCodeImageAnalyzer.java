@@ -19,6 +19,10 @@ import static android.graphics.ImageFormat.YUV_420_888;
 import static android.graphics.ImageFormat.YUV_422_888;
 import static android.graphics.ImageFormat.YUV_444_888;
 
+/**
+ * Allows for an image to be scanned in real time to search for QR codes within
+ * the image.
+ */
 public class QRCodeImageAnalyzer implements ImageAnalysis.Analyzer {
     private final QRCodeFoundListener listener;
 

@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 /**
- * The player collection class display's a players statistics and
+ * The player collection activity display's a players statistics and
  * any QR codes which have been added to their code. QR codes can be selected to view
  * who has commented on them, and also who has scanned them.
  */

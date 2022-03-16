@@ -28,6 +28,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.MessageDigest;
 import java.util.function.Consumer;
 
+/**
+ * The save QR activity allows a user to save a QR code to their player profile, and also
+ * gives the user two additional options:
+ * 1. to track geolocation of found QR code
+ * 2. to add an image to their profile associated with the QR code
+ */
 public class SaveQR extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();

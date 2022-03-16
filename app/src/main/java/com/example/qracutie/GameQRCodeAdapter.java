@@ -16,6 +16,10 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * An array adapter which is used to display a list of QR codes within the
+ * PlayerCollectionActivity. FOr each QR code, displays an image and an amount of points
+ */
 public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
     private ArrayList<GameQRCode> qrCodes;
     HashMap<String, Bitmap> qrCodeImages;

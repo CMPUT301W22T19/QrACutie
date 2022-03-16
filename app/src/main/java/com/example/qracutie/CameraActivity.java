@@ -28,7 +28,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
 
-
+/**
+ * Allows a player to scan QR codes and also capture images
+ * of said QR codes. Accessed via the MainActivity
+ */
 public class CameraActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
