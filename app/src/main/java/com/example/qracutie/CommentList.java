@@ -23,12 +23,24 @@ public class CommentList extends ArrayAdapter<Comment> {
     private ArrayList<Comment> comments;
     private Context context;
 
+    /**
+     * Constructor for the object
+     * @param context
+     * @param comments
+     */
     public CommentList(Context context, ArrayList<Comment> comments){
         super(context,0, comments);
         this.comments = comments;
         this.context = context;
     }
 
+    /**
+     * Gets view object containing comments and users who created them that were passed to the
+     * constructor. For use on comments page of app
+     * @param position
+     * @param convertView
+     * @param parent
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

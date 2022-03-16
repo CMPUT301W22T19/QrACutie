@@ -59,6 +59,10 @@ public class CommentsPage extends AppCompatActivity {
 
     CommentList customList;
 
+    /**
+     * Called when activity is created
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +87,10 @@ public class CommentsPage extends AppCompatActivity {
 
         // Wait for 'Add Comment' button to be clicked and add input to database
         addCommentButton.setOnClickListener( new View.OnClickListener() {
+            /**
+             * When user clicks the 'add comment' button, add the input text to the database
+             * @param view
+             */
             @Override
             public void onClick(View view) {
 
@@ -115,6 +123,10 @@ public class CommentsPage extends AppCompatActivity {
                         .document(commentText)
                         .set(data)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            /**
+                             * Log if database record upload successful
+                             * @param aVoid
+                             */
                             @Override
                             public void onSuccess(Void aVoid) {
                                 // These are a method which gets executed when the task is succeeded
@@ -123,6 +135,10 @@ public class CommentsPage extends AppCompatActivity {
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
+                            /**
+                             * Log if database record upload unsuccessful
+                             * @param e
+                             */
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 // These are a method which gets executed if there’s any problem
@@ -137,6 +153,11 @@ public class CommentsPage extends AppCompatActivity {
 
         // Grab data from database and populate into activity
         collectionReference.orderBy("date").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            /**
+             * Load items from firestore database into teh ListView on activity
+             * @param queryDocumentSnapshots
+             * @param error
+             */
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                     FirebaseFirestoreException error) {
