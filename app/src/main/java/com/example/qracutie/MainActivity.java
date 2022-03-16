@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private String phonenumber = "";
 
     private ImageView profile;
+    private Button userCollectionButton;
     private String profile_image = "profileImage";
     private String profile_image_uri = "";
     private String profile_image_stored = "";
