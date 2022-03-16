@@ -45,6 +45,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The MainActivity is the landing page for a user when they launch the app. From the
+ * main activity, the user can switch to the player collection activity, camera activity,
+ * account activity, or map activity.
+ *
+ * Within the main activity, a player profile will be displayed, as well as a leaderboard
+ * of all players, sorted according to some specified criteria.
+ */
 public class MainActivity extends AppCompatActivity {
     private Button userAccountButton;
     private TextView nameDisplayed;
