@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String TEXT = "username";
 
+    public static final String EXTRA_PLAYER_COLLECTION_USERNAME = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_USERNAME";
+    public static final String EXTRA_PLAYER_COLLECTION_ISOWNER = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_ISOWNER";
+
     private Player player;
     private String username = "";
     private String email = "";
@@ -117,6 +120,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // add on click listener for my collection button
+        Button myCollection = findViewById(R.id.collection_button);
+        myCollection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openPlayerCollectionActivity(player);
+            }
+        });
+
         Button button1 = (Button)findViewById(R.id.cameraButton);
         button1.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), CameraActivity.class);
@@ -175,6 +187,28 @@ public class MainActivity extends AppCompatActivity {
         }
         sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         sharedPreferences.edit().clear().commit();
+    }
+
+    /**
+     * switches to a PlayerCollection activity wherein the user will be able to see the
+     * details of a specific player profile, including player statistics and a list of all
+     * QR Codes which have been collected
+     */
+    private void openPlayerCollectionActivity(Player playerToView) {
+
+        Intent intent = new Intent(this, PlayerCollectionActivity.class);
+
+        intent.putExtra(EXTRA_PLAYER_COLLECTION_USERNAME, playerToView.getUsername());
+
+        if (playerToView.getUsername().equals(this.player.getUsername())) {
+            // player would like to view their own collection
+            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, true);
+        } else {
+            // player would like to view someone else's collection
+            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, false);
+        }
+
+        startActivity(intent);
     }
 
     private void draw_profile_image(){
