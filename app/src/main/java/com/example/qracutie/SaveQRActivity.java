@@ -1,9 +1,6 @@
 package com.example.qracutie;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -13,7 +10,6 @@ import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -34,7 +30,7 @@ import java.util.function.Consumer;
  * 1. to track geolocation of found QR code
  * 2. to add an image to their profile associated with the QR code
  */
-public class SaveQR extends AppCompatActivity {
+public class SaveQRActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -65,6 +61,7 @@ public class SaveQR extends AppCompatActivity {
                     REQUEST_LOCATION_PERMISSION);
         }
 
+        // NOT YET FULLY IMPLEMENTED
         Button button1 = (Button) findViewById(R.id.CapturePic);
         button1.setOnClickListener(view -> {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -109,7 +106,7 @@ public class SaveQR extends AppCompatActivity {
                         locationManager.getCurrentLocation(
                                 LocationManager.GPS_PROVIDER,
                                 null,
-                                SaveQR.this.getMainExecutor(),
+                                SaveQRActivity.this.getMainExecutor(),
                                 new Consumer<Location>() {
                                     @Override
                                     public void accept(Location location) {

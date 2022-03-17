@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +24,6 @@ import androidx.lifecycle.LifecycleOwner;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -60,7 +58,7 @@ public class CameraActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //String hash = sha256(qrCode);
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(v.getContext(), SaveQR.class);
+                Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
                 intent.putExtra("qrcode", qrCode);
                 v.getContext().startActivity(intent);
             }
