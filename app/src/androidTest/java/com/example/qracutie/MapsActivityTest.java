@@ -10,6 +10,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import com.robotium.solo.Solo;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,5 +52,10 @@ public class MapsActivityTest {
 
         // Asserts that the current activity switched to MainActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        solo.finishOpenedActivities();
     }
 }
