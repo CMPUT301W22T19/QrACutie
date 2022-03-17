@@ -52,8 +52,9 @@ import java.util.Map;
  * Retrieves player location and shows Qr Codes within a certain range
  *
  * Code for accessing location, asking for permissions, and onLocationChange listener have been used from -
- * https://github.com/mohsinulkabir14/An-Android-Application-to-Show-Your-Position-On-The-Map-Using-Google-Maps-API/blob/master/app/src/main/java/com/example/maplocation/MapsActivity.java
- *
+ * From: Github
+ * URL: https://github.com/mohsinulkabir14/An-Android-Application-to-Show-Your-Position-On-The-Map-Using-Google-Maps-API/blob/master/app/src/main/java/com/example/maplocation/MapsActivity.java
+ * Author:Mohsinul Kabir
  */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
