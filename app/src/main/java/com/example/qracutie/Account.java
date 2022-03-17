@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * The account activity allows a player to chang contact information associated with
+ * their player profile, such as email and phone number
+ */
 public class Account extends AppCompatActivity {
     private EditText newEmail;
     private EditText newPhonenumber;

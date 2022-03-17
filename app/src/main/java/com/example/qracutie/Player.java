@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+/**
+ * Represents an application user. Allows the user to collect QR codes, track information
+ * related to their collection like images, statistics, and geolocations. A Player is
+ * identified using their username. Each username is guaranteed to be unique.
+ */
 public class Player {
     String username = ""; // unique alphanumeric identifier
     String email = "";

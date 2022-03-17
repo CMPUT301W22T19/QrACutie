@@ -28,11 +28,16 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Activity that calls the camera in order to scan a QR Code
+ * Allows a player to scan QR codes and also capture images
+ * of said QR codes. Accessed via the MainActivity
  *
  * Majority of the entire class was implemented using -
  * From: Learn To Android
  * URL:https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
  * Author:Jarrod Lilkendey
+ */
+/**
+
  */
 public class CameraActivity extends AppCompatActivity {
 
