@@ -36,9 +36,6 @@ import java.util.concurrent.ExecutionException;
  * URL:https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
  * Author:Jarrod Lilkendey
  */
-/**
-
- */
 public class CameraActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
