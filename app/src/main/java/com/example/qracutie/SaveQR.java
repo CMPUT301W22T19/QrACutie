@@ -22,6 +22,8 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -31,7 +33,6 @@ import java.util.function.Consumer;
 public class SaveQR extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
@@ -39,11 +40,16 @@ public class SaveQR extends AppCompatActivity {
     double scannedLatitude;
     double scannedLongitude;
     Boolean boxChecked = false;
+    ImageView imageView;
+    Button captureQR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
+
+        imageView = findViewById(R.id.QRView);
+
 
         Intent intent = getIntent();
         String qrCodeString = intent.getStringExtra("qrcode");
@@ -59,13 +65,30 @@ public class SaveQR extends AppCompatActivity {
                     REQUEST_LOCATION_PERMISSION);
         }
 
-        Button button1 = (Button) findViewById(R.id.CapturePic);
-        button1.setOnClickListener(view -> {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            try {
-                activityResultLauncher.launch(takePictureIntent);
-            } catch (ActivityNotFoundException e) {
-                // display error state to the user
+
+        Button captureQR = (Button) findViewById(R.id.CapturePic);
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                     if(result.getResultCode()== RESULT_OK && result.getData() != null){
+                         Bundle bundle = result.getData().getExtras();
+                         Bitmap bitmap = (Bitmap) bundle.get("data");
+                         imageView.setImageBitmap(bitmap);
+                     }
+            }
+        });
+        captureQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent1.resolveActivity(getPackageManager()) != null){
+                    activityResultLauncher.launch(intent1);}
+
+                    else{
+                        Toast.makeText(SaveQR.this, "Error capturing image", Toast.LENGTH_SHORT).show();
+                    }
+
+
             }
         });
 
