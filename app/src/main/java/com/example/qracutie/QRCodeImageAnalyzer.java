@@ -30,10 +30,19 @@ import static android.graphics.ImageFormat.YUV_444_888;
 public class QRCodeImageAnalyzer implements ImageAnalysis.Analyzer {
     private final QRCodeFoundListener listener;
 
+    /**
+     * generates a new instance of the QRCodeAnalyzer class, having a specific listener
+     * interface
+     * @param listener an implementation of QRCodeFoundListener
+     */
     public QRCodeImageAnalyzer(QRCodeFoundListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * analyzes image of the QR code and extracts data from it
+     * @param image an ImageProxy object
+     */
     @Override
     public void analyze(@NonNull ImageProxy image) {
         if (image.getFormat() == YUV_420_888 || image.getFormat() == YUV_422_888 || image.getFormat() == YUV_444_888) {

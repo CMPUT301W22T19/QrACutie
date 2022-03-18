@@ -86,6 +86,11 @@ public class SaveQRActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * after user checks the enable location box, the method tests to see if user has enabled
+     * location permissions on their device, and then requests location from the device
+     * @param view check box element
+     */
     @SuppressLint("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onCheckboxClicked(View view) {
@@ -126,6 +131,11 @@ public class SaveQRActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * hashes a string representation of a QR code using the sha 256 algorithm
+     * @param base string representation of QR code
+     * @return QR code hash
+     */
     // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
     public static String shaHash(final String base) {
         try{
