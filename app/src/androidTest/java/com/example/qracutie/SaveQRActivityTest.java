@@ -3,6 +3,7 @@ package com.example.qracutie;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,7 +23,16 @@ public class SaveQRActivityTest {
 
     @Rule
     public ActivityTestRule<SaveQR> rule =
-            new ActivityTestRule<>(SaveQR.class, true, true);
+            new ActivityTestRule<SaveQR>(SaveQR.class, true, true){
+                @Override
+                protected Intent getActivityIntent (){
+                    Intent intent = new Intent();
+                    intent.putExtra("qrcode","11");
+                    return intent;
+                }
+            };
+//    public ActivityTestRule<SaveQR> rule =
+//            new ActivityTestRule<>(SaveQR.class, true, true);
 
 
     @Before
@@ -59,20 +69,14 @@ public class SaveQRActivityTest {
      */
     @Test
     public void checkCaptureButton() {
-        // Asserts that the current activity is the Camera activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", CameraActivity.class);
 
-        // click the QR code found button
-        assertTrue(solo.waitForText("QR Code Found", 1, 2000));
-        Button button1 = (Button) solo.getView(R.id.qrCodeFoundButton);
-        solo.clickOnView(button1);
 
         // Asserts that the current activity is the SaveQR Activity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", SaveQR.class);
 
         // click the capture button
         assertTrue(solo.waitForText("Capture", 1, 2000));
-        Button button = (Button) solo.getView(R.id.qrCodeFoundButton);
+        Button button = (Button) solo.getView(R.id.CapturePic);
         solo.clickOnView(button);
 
         // Asserts that the current activity stays in SaveQR activity. Otherwise, show “Wrong Activity”
