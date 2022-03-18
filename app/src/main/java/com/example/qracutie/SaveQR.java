@@ -41,7 +41,7 @@ public class SaveQR extends AppCompatActivity {
     double scannedLongitude;
     Boolean boxChecked = false;
     ImageView imageView;
-    Button captureQR;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
