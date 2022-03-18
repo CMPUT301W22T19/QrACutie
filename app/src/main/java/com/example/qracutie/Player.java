@@ -50,26 +50,50 @@ public class Player {
         this.username = username;
     }
 
+    /**
+     * returns email string of the user
+     * @return email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * sets email of user to specified string
+     * @param email new email to set
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /**
+     * returns the phone number string associated with user
+     * @return phone number
+     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    /**
+     * sets phone number of user to a specified string
+     * @param phoneNumber new phone number to set
+     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
+    /**
+     * returns a URI string that maps to a user profile image in the database
+     * @return URI string
+     */
     public String getProfileImage() {
         return profileImage;
     }
 
+    /**
+     * Sets a URI string that maps to a profile image in the database
+     * @param profileImage new URI string
+     */
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }

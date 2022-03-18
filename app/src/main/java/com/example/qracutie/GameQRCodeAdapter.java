@@ -25,6 +25,12 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
     HashMap<String, Bitmap> qrCodeImages;
     private Context context;
 
+    /**
+     * generates a new instance of the GameQRCodeAdapter class
+     * @param context the context of the caller class
+     * @param qrCodes an array list of GameQRCode objects
+     * @param qrCodeImages a hashmap of QRCode identifiers and images saved as Bitmaps
+     */
     public GameQRCodeAdapter(Context context, ArrayList<GameQRCode> qrCodes, HashMap<String, Bitmap> qrCodeImages) {
         super(context, 0, qrCodes);
         this.qrCodes = qrCodes;
@@ -32,6 +38,14 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
         this.qrCodeImages = qrCodeImages;
     }
 
+    /**
+     * generates and returns a View element representing a single GameQRCode, which is part
+     * of a ListView
+     * @param position the index of the view within a list
+     * @param convertView an old view to reuse
+     * @param parent the list which contains the view
+     * @return View element
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
