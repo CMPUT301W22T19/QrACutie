@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Retrieves the info of an existiing player from the database
+     * Retrieves the info of an existing player from the database
      */
     private void getPlayerInfo(){
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
