@@ -1,6 +1,7 @@
 package com.example.qracutie;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -19,6 +20,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.security.MessageDigest;
@@ -79,11 +83,28 @@ public class SaveQRActivity extends AppCompatActivity {
                 scannedQrCode.setLatitude(scannedLatitude);
                 scannedQrCode.setLongitude(scannedLongitude);
             }
-            db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+            isUniqueCheck();
             Intent intentMain = new Intent(this, MainActivity.class);
             startActivity(intentMain);
         });
 
+    }
+
+    private void isUniqueCheck(){
+        db.collection("GameQRCodes").document(scannedQrCode.getHash()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.getResult().exists()){
+                    // this is a duplicated username
+                    scannedQrCode = task.getResult().toObject(GameQRCode.class);
+                    scannedQrCode.incrementAmountOfScans();
+                    db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                }else{
+                    // create the user
+                    db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                }
+            }
+        });
     }
 
     /**
