@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -25,7 +26,13 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.OnProgressListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.security.MessageDigest;
 import java.util.function.Consumer;
@@ -33,6 +40,9 @@ import java.util.function.Consumer;
 public class SaveQR extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("GameQRImages");
+
+    private static final int REQUEST_IMAGE_CAPTURE = 111;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
@@ -45,6 +55,7 @@ public class SaveQR extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
 
@@ -53,6 +64,7 @@ public class SaveQR extends AppCompatActivity {
 
         Intent intent = getIntent();
         String qrCodeString = intent.getStringExtra("qrcode");
+
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
         scannedQrCode = new GameQRCode(qrCodeHash, points);
@@ -64,6 +76,9 @@ public class SaveQR extends AppCompatActivity {
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         }
+
+
+
         // From: Youtube
         // URL: //https://www.youtube.com/watch?v=qO3FFuBrT2E&t=380s
         // Author: Coding Demos
@@ -89,7 +104,8 @@ public class SaveQR extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (intent1.resolveActivity(getPackageManager()) != null){
-                    activityResultLauncher.launch(intent1);}
+                    activityResultLauncher.launch(intent1);
+                    }
 
                     else{
                         Toast.makeText(SaveQR.this, "Error capturing image", Toast.LENGTH_SHORT).show();
