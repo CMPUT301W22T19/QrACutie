@@ -1,6 +1,9 @@
 package com.example.qracutie;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -19,6 +23,8 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -37,7 +43,6 @@ import java.util.function.Consumer;
 public class SaveQRActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
@@ -45,11 +50,16 @@ public class SaveQRActivity extends AppCompatActivity {
     double scannedLatitude;
     double scannedLongitude;
     Boolean boxChecked = false;
+    ImageView imageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
+
+        imageView = findViewById(R.id.QRView);
+
 
         Intent intent = getIntent();
         String qrCodeString = intent.getStringExtra("qrcode");
@@ -64,15 +74,35 @@ public class SaveQRActivity extends AppCompatActivity {
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         }
+        // From: Youtube
+        // URL: //https://www.youtube.com/watch?v=qO3FFuBrT2E&t=380s
+        // Author: Coding Demos
 
-        // NOT YET FULLY IMPLEMENTED
-        Button button1 = (Button) findViewById(R.id.CapturePic);
-        button1.setOnClickListener(view -> {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            try {
-                activityResultLauncher.launch(takePictureIntent);
-            } catch (ActivityNotFoundException e) {
-                // display error state to the user
+        // From: Android Studio docs
+        // URL:https://developer.android.com/training/camera/photobasics
+        // Author: Google
+
+        // uses built-in camera to save image
+        Button captureQR = (Button) findViewById(R.id.CapturePic);
+        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                     if(result.getResultCode()== RESULT_OK && result.getData() != null){
+                         Bundle bundle = result.getData().getExtras();
+                         Bitmap bitmap = (Bitmap) bundle.get("data");
+                         imageView.setImageBitmap(bitmap);
+                     }
+            }
+        });
+        captureQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intent1.resolveActivity(getPackageManager()) != null) {
+                    activityResultLauncher.launch(intent1);
+                } else {
+                    Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -87,7 +117,6 @@ public class SaveQRActivity extends AppCompatActivity {
             Intent intentMain = new Intent(this, MainActivity.class);
             startActivity(intentMain);
         });
-
     }
 
     private void isUniqueCheck(){
