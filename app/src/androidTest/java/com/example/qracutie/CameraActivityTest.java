@@ -50,7 +50,7 @@ public class CameraActivityTest {
         solo.clickOnView(button);
 
         // Asserts that the current activity switched to SAVEQR Activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQR.class);
+        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
     }
 
 

@@ -1,11 +1,12 @@
 package com.example.qracutie;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.os.Environment;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -95,6 +96,38 @@ public class MainActivityTest {
 
         // assert that username appears in collection activity
         assertTrue(solo.waitForText(username, 1, 2000));
+    }
+
+    /**
+     * checks if activity correctly switches when maps button is pressed
+     */
+    @Test
+    public void checkMapActivitySwitch(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+
+        // click the map button
+        ImageButton button = (ImageButton) solo.getView(R.id.mapButton);
+        solo.clickOnView(button);
+
+        // Asserts that the current activity switched to MapsActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MapsActivity.class);
+    }
+
+    /**
+     * checks if activity correctly switches when the camera button is pressed
+     */
+    @Test
+    public void checkCameraActivitySwitch(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+
+        // click the camera button
+        Button button = (Button) solo.getView(R.id.cameraButton);
+        solo.clickOnView(button);
+
+        // Asserts that the current activity switched to CameraActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", CameraActivity.class);
     }
 
     @After

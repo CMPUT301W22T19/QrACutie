@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -25,12 +26,21 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.security.MessageDigest;
 import java.util.function.Consumer;
 
-public class SaveQR extends AppCompatActivity {
+/**
+ * The save QR activity allows a user to save a QR code to their player profile, and also
+ * gives the user two additional options:
+ * 1. to track geolocation of found QR code
+ * 2. to add an image to their profile associated with the QR code
+ */
+public class SaveQRActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final int REQUEST_LOCATION_PERMISSION = 1;
@@ -88,14 +98,11 @@ public class SaveQR extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent1.resolveActivity(getPackageManager()) != null){
-                    activityResultLauncher.launch(intent1);}
-
-                    else{
-                        Toast.makeText(SaveQR.this, "Error capturing image", Toast.LENGTH_SHORT).show();
-                    }
-
-
+                if (intent1.resolveActivity(getPackageManager()) != null) {
+                    activityResultLauncher.launch(intent1);
+                } else {
+                    Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -106,13 +113,34 @@ public class SaveQR extends AppCompatActivity {
                 scannedQrCode.setLatitude(scannedLatitude);
                 scannedQrCode.setLongitude(scannedLongitude);
             }
-            db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+            isUniqueCheck();
             Intent intentMain = new Intent(this, MainActivity.class);
             startActivity(intentMain);
         });
-
     }
 
+    private void isUniqueCheck(){
+        db.collection("GameQRCodes").document(scannedQrCode.getHash()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.getResult().exists()){
+                    // this is a duplicated username
+                    scannedQrCode = task.getResult().toObject(GameQRCode.class);
+                    scannedQrCode.incrementAmountOfScans();
+                    db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                }else{
+                    // create the user
+                    db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                }
+            }
+        });
+    }
+
+    /**
+     * after user checks the enable location box, the method tests to see if user has enabled
+     * location permissions on their device, and then requests location from the device
+     * @param view check box element
+     */
     @SuppressLint("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onCheckboxClicked(View view) {
@@ -133,7 +161,7 @@ public class SaveQR extends AppCompatActivity {
                         locationManager.getCurrentLocation(
                                 LocationManager.GPS_PROVIDER,
                                 null,
-                                SaveQR.this.getMainExecutor(),
+                                SaveQRActivity.this.getMainExecutor(),
                                 new Consumer<Location>() {
                                     @Override
                                     public void accept(Location location) {
@@ -153,6 +181,11 @@ public class SaveQR extends AppCompatActivity {
         }
     }
 
+    /**
+     * hashes a string representation of a QR code using the sha 256 algorithm
+     * @param base string representation of QR code
+     * @return QR code hash
+     */
     // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
     public static String shaHash(final String base) {
         try{

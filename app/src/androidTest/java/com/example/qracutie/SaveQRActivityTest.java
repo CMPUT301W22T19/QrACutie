@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.CheckBox;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -22,8 +23,8 @@ public class SaveQRActivityTest {
     private Solo solo;
 
     @Rule
-    public ActivityTestRule<SaveQR> rule =
-            new ActivityTestRule<SaveQR>(SaveQR.class, true, true){
+    public ActivityTestRule<SaveQRActivity> rule =
+            new ActivityTestRule<SaveQRActivity>(SaveQRActivity.class, true, true){
                 @Override
                 protected Intent getActivityIntent (){
                     Intent intent = new Intent();
@@ -31,9 +32,6 @@ public class SaveQRActivityTest {
                     return intent;
                 }
             };
-//    public ActivityTestRule<SaveQR> rule =
-//            new ActivityTestRule<>(SaveQR.class, true, true);
-
 
     @Before
     public void setUp() throws Exception {
@@ -53,7 +51,7 @@ public class SaveQRActivityTest {
 
 
         // Asserts that the current activity is switched too SaveQR. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQR.class);
+        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
 
         // click the Done button
         assertTrue(solo.waitForText("Done", 1, 2000));
@@ -72,7 +70,7 @@ public class SaveQRActivityTest {
 
 
         // Asserts that the current activity is the SaveQR Activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQR.class);
+        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
 
         // click the capture button
         assertTrue(solo.waitForText("Capture", 1, 2000));
@@ -80,9 +78,25 @@ public class SaveQRActivityTest {
         solo.clickOnView(button);
 
         // Asserts that the current activity stays in SaveQR activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQR.class);
+        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
     }
 
+    /**
+     * checks if Check Box is checked
+     */
+    @Test
+    public void checkCheckBoxChecked() {
+        // Asserts that the current activity is the SaveQRActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
+
+        // click the account button
+        assertTrue(solo.waitForText("Save Location", 1, 2000));
+        CheckBox checkBox = (CheckBox) solo.getView(R.id.location);
+        solo.clickOnView(checkBox);
+
+        // Asserts that the current activity switched to MainActivity. Otherwise, show “Wrong Activity”
+        solo.isCheckBoxChecked("Save Location");
+    }
 
     @After
     public void tearDown() throws Exception {

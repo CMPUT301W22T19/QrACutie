@@ -29,6 +29,14 @@ public class CommentList extends ArrayAdapter<Comment> {
         this.context = context;
     }
 
+    /**
+     * generates and returns a View element representing a single comment, which is part
+     * of a ListView
+     * @param position the index of the view within a list
+     * @param convertView an old view to reuse
+     * @param parent the list which contains the view
+     * @return View element
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

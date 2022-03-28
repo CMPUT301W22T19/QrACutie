@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
@@ -25,13 +24,19 @@ import androidx.lifecycle.LifecycleOwner;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
 
-// From: "Learn to Droid" website
-// URL: https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
-// Author:Jarrod Lilkendey
 
+/**
+ * Activity that calls the camera in order to scan a QR Code
+ * Allows a player to scan QR codes and also capture images
+ * of said QR codes. Accessed via the MainActivity
+ *
+ * Majority of the entire class was implemented using -
+ * From: Learn To Android
+ * URL:https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
+ * Author:Jarrod Lilkendey
+ */
 public class CameraActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -60,7 +65,7 @@ public class CameraActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //String hash = sha256(qrCode);
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(v.getContext(), SaveQR.class);
+                Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
                 intent.putExtra("qrcode", qrCode);
                 v.getContext().startActivity(intent);
             }
@@ -82,6 +87,12 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks the result of the request permission for the camera
+     * @param requestCode the request
+     * @param permissions the permissions
+     * @param grantResults the grant results
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
