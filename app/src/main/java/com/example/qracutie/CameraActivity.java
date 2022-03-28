@@ -28,6 +28,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
 
+// From: "Learn to Droid" website
+// URL: https://learntodroid.com/how-to-create-a-qr-code-scanner-app-in-android/
+// Author:Jarrod Lilkendey
 
 public class CameraActivity extends AppCompatActivity {
 

@@ -64,8 +64,15 @@ public class SaveQR extends AppCompatActivity {
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         }
+        // From: Youtube
+        // URL: //https://www.youtube.com/watch?v=qO3FFuBrT2E&t=380s
+        // Author: Coding Demos
 
+        // From: Android Studio docs
+        // URL:https://developer.android.com/training/camera/photobasics
+        // Author: Google
 
+        // uses built-in camera to save image
         Button captureQR = (Button) findViewById(R.id.CapturePic);
         activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
             @Override

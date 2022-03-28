@@ -7,6 +7,7 @@ package com.example.qracutie;
  * Adapted in large parts from the MainActivity Class shown in CMPUT 301's labs
  */
 public class Comment {
+
     private String commentString;
     private String uID;
     private String date;
