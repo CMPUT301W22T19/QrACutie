@@ -61,6 +61,18 @@
             android:text="Account" />
 
         <ImageButton
+            android:id="@+id/user_qr_button"
+            android:layout_width="42dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="142dp"
+            android:layout_marginEnd="25dp"
+            android:onClick="userQrButtonClicked"
+            android:text="QR"
+            android:background="@android:drawable/ic_dialog_map" />
+
+
+        <ImageButton
             android:id="@+id/mapButton"
             android:layout_width="42dp"
             android:layout_height="35dp"

@@ -1,32 +1,25 @@
 package com.example.qracutie;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.Toast;
-import android.widget.Button;
 import android.os.Environment;
-
 import android.provider.MediaStore;
-
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,7 +47,11 @@ import java.util.concurrent.ThreadLocalRandom;
  * of all players, sorted according to some specified criteria.
  */
 public class MainActivity extends AppCompatActivity {
+
+    public static final String EXTRA_COMMENTS_USERNAME = "com.example.qracutie.EXTRA_COMMENTS_USERNAME";
+
     private Button userAccountButton;
+    private ImageButton userQrButton;
     private TextView nameDisplayed;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -123,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         userAccountButton = (Button) findViewById(R.id.user_account_button);
+        userQrButton = (ImageButton) findViewById(R.id.user_qr_button);
         nameDisplayed = (TextView) findViewById(R.id.display_name);
 
         onCreated = true;
@@ -386,6 +384,17 @@ public class MainActivity extends AppCompatActivity {
      */
     public void userAccountButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this,Account.class);
+
+        startActivityIfNeeded(intent, 255);
+    }
+
+    /**
+     * Onclick method for when the user accesses their account info (email and phone number)
+     * @param view
+     */
+    public void userQrButtonClicked(View view) {
+        Intent intent = new Intent(MainActivity.this, ShareableQrActivity.class);
+        intent.putExtra(EXTRA_COMMENTS_USERNAME, username);
         startActivityIfNeeded(intent, 255);
     }
 
