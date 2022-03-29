@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,17 +26,20 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
     HashMap<String, Bitmap> qrCodeImages;
     private Context context;
 
+    boolean showOptions;
+
     /**
      * generates a new instance of the GameQRCodeAdapter class
      * @param context the context of the caller class
      * @param qrCodes an array list of GameQRCode objects
      * @param qrCodeImages a hashmap of QRCode identifiers and images saved as Bitmaps
      */
-    public GameQRCodeAdapter(Context context, ArrayList<GameQRCode> qrCodes, HashMap<String, Bitmap> qrCodeImages) {
+    public GameQRCodeAdapter(Context context, ArrayList<GameQRCode> qrCodes, HashMap<String, Bitmap> qrCodeImages, boolean showOptions) {
         super(context, 0, qrCodes);
         this.qrCodes = qrCodes;
         this.context = context;
         this.qrCodeImages = qrCodeImages;
+        this.showOptions = showOptions;
     }
 
     /**
@@ -70,6 +74,32 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
         // set qr code points
         TextView qrCodePoints = view.findViewById(R.id.qr_code_list_points_val);
         qrCodePoints.setText(String.valueOf(qrCode.getPoints()));
+
+        // set qr code scans
+        TextView qrCodeScans = view.findViewById(R.id.qr_code_list_scans_val);
+        qrCodeScans.setText(String.valueOf(qrCode.getAmountOfScans()));
+
+        // add click listener on entire QR code
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((PlayerCollectionActivity) context).viewCommentsActivity(qrCode);
+            }
+        });
+
+        Button optionsButton = view.findViewById(R.id.options_button);
+        if (showOptions) {
+            // add click listener on more options button
+            optionsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((PlayerCollectionActivity) context).showOptions(qrCode);
+                }
+            });
+        } else {
+            // make options button invisible
+            optionsButton.setVisibility(View.INVISIBLE);
+        }
 
         return view;
     }
