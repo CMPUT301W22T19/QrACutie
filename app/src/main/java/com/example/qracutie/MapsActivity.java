@@ -2,7 +2,6 @@ package com.example.qracutie;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -22,7 +21,11 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,8 +69,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker playerMarker;
     private ActivityMapsBinding binding;
     Circle circle;
+    ListView qrCodeList;
+    NearbyQRCode selectedQRCode;
+    ArrayAdapter<NearbyQRCode> nearByCodesAdapter;
     HashMap<String, GameQRCode> qrCodes = new HashMap<>();
     HashMap<String, MarkerOptions> markersOnMap = new HashMap<>();
+    ArrayList<NearbyQRCode> nearbyQRCodes = new ArrayList<>();
     Button backButton;
 
     @SuppressLint("MissingPermission")
@@ -82,7 +89,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        backButton = findViewById(R.id.back);
+        qrCodeList = findViewById(R.id.nearby_qr_code_list);
+
+        /*
+        The follow on click listener will require a lot of changes to the functionality of this code
+         */
+        qrCodeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object listItem = qrCodeList.getItemAtPosition(position);
+                if(selectedQRCode != null) {
+                }
+                selectedQRCode = (NearbyQRCode) listItem;
+            }
+        });
+
+        backButton = findViewById(R.id.maps_back);
         backButton.setOnClickListener(view -> {
             Intent intentMain = new Intent(this, MainActivity.class);
             startActivity(intentMain);
@@ -104,6 +126,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     REQUEST_LOCATION_PERMISSION);
         }
 
+        nearByCodesAdapter = new NearByCodesAdapter(this, nearbyQRCodes);
         locationListener = new LocationListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -133,6 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .center(latLng)
                             .radius(250)
                             .strokeColor(Color.BLACK));
+                    nearbyQRCodes.clear();
                     updateQRCodeMarkers();
                 }
             }
@@ -150,7 +174,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 GameQRCode gameQRCode = document.toObject(GameQRCode.class);
-                                qrCodes.put(gameQRCode.getHash(), gameQRCode);
+                                if(gameQRCode.getLatitude() != 0 && gameQRCode.getLongitude() != 0) {
+                                    qrCodes.put(gameQRCode.getHash(), gameQRCode);
+                                }
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -178,21 +204,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             switch (dc.getType()) {
                                 case ADDED:
-                                    Log.d(TAG, "New city: " + dc.getDocument().getData());
                                     GameQRCode addedQRCode = dc.getDocument().toObject(GameQRCode.class);
-                                    qrCodes.put(addedQRCode.getHash(), addedQRCode);
+                                    if(addedQRCode.getLatitude() != 0 && addedQRCode.getLongitude() != 0) {
+                                        qrCodes.put(addedQRCode.getHash(), addedQRCode);
+                                    }
                                     addBarcodeMarker(addedQRCode);
                                     break;
                                 case MODIFIED:
-                                    Log.d(TAG, "Modified city: " + dc.getDocument().getData());
                                     GameQRCode modifiedQRCode = dc.getDocument().toObject(GameQRCode.class);
-                                    qrCodes.put(modifiedQRCode.getHash(), modifiedQRCode);
-                                    MarkerOptions modifiedMarker = markersOnMap.remove(modifiedQRCode.getHash());
-                                    modifiedMarker.visible(false);
-                                    addBarcodeMarker(modifiedQRCode);
+                                    if(modifiedQRCode.getLatitude() != 0 && modifiedQRCode.getLongitude() != 0) {
+                                        qrCodes.put(modifiedQRCode.getHash(), modifiedQRCode);
+                                        MarkerOptions modifiedMarker = markersOnMap.remove(modifiedQRCode.getHash());
+                                        modifiedMarker.visible(false);
+                                        addBarcodeMarker(modifiedQRCode);
+                                    }
                                     break;
                                 case REMOVED:
-                                    Log.d(TAG, "Removed city: " + dc.getDocument().getData());
                                     GameQRCode removedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.remove(removedQRCode.getHash());
                                     MarkerOptions removedMarker = markersOnMap.remove(removedQRCode.getHash());
@@ -216,6 +243,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             else{
                 marker.visible(true);
+                int barcode_icon = R.drawable.stock_barcode_icon;
+                GameQRCode qrCode = qrCodes.get(hash);
+                if (qrCode.getPoints() < 500) barcode_icon = R.drawable.green_barcode_icon;
+                if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1750) barcode_icon = R.drawable.yellow_barcode_icon;
+                if (qrCode.getPoints() >= 1750 && qrCode.getPoints() < 3000) barcode_icon = R.drawable.orange_barcode_icon;
+                if (qrCode.getPoints() >= 3000 && qrCode.getPoints() < 6500) barcode_icon = R.drawable.red_barcode_icon;
+                if (qrCode.getPoints() >= 6500) barcode_icon = R.drawable.purple_barcode_icon;
+
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(barcode_icon);
+                Bitmap b = bitmapdraw.getBitmap();
+                nearbyQRCodes.add(new NearbyQRCode(qrCode.getPoints(),hash, Double.toString(distance), b));
+                qrCodeList.setAdapter(nearByCodesAdapter);
             }
             markersOnMap.put(hash, marker);
             mMap.addMarker(marker);
@@ -282,7 +321,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a temp marker near the UofA.
+     * we just add a temp marker.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -290,7 +329,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap=googleMap;
-        playerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(53.526002, -113.525522)).title("You"));
+        playerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(84.969627, 176.234282)).title("You"));
         initializeListQRCodes();
         updateQRCodes();
     }
