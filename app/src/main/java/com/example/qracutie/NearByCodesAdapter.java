@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -68,7 +69,9 @@ public class NearByCodesAdapter extends ArrayAdapter<NearbyQRCode> {
         qrCodePoints.setText(String.valueOf(qrCode.getPoints()));
 
         TextView qrCodeDistance = view.findViewById(R.id.distance);
-        qrCodeDistance.setText(qrCode.getDistance());
+        double distance = Double.valueOf(qrCode.getDistance());
+        DecimalFormat df = new DecimalFormat("###.##");
+        qrCodeDistance.setText(df.format(distance) + " m");
 
         ImageView qrCodeImage = view.findViewById(R.id.nearby_qr_code_list_image);
         qrCodeImage.setImageBitmap(qrCode.getImage());
