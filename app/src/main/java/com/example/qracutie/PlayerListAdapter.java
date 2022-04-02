@@ -23,6 +23,7 @@ import java.util.HashMap;
 public class PlayerListAdapter extends ArrayAdapter<Player> {
     private ArrayList<Player> players;
     private Context context;
+    private String display = "pointTotal";
 
     /**
      * generates a new instance of the PlayerListAdapter class
@@ -31,7 +32,12 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
      */
     public PlayerListAdapter(Context context, ArrayList<Player> players) {
         super(context, 0, players);
+        this.context = context;
         this.players = players;
+    }
+
+    public void setDisplay(String display) {
+        this.display = display;
     }
 
     /**
@@ -63,11 +69,26 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
 
         // set player score
         TextView playerScore = view.findViewById(R.id.player_list_score);
-        playerScore.setText(player.getTotalCodes());
+        if (display.equals("pointTotal")) {
+            playerScore.setText(String.valueOf(player.getPointTotal()));
+        } else if (display.equals("totalCodes")){
+            playerScore.setText(String.valueOf(player.getTotalCodes()));
+        } else {
+            // TODO implement
+            playerScore.setText("missing");
+        }
 
         // set player rank
         TextView playerRank = view.findViewById(R.id.player_list_rank);
-        playerScore.setText(player.getTotalCodes());
+        playerRank.setText(String.valueOf(position + 1));
+
+        // set click listener on entire view
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) context).openPlayerCollectionActivity(player);
+            }
+        });
 
         return view;
     }

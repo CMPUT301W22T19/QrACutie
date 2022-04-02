@@ -17,7 +17,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.os.Environment;
@@ -34,6 +36,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -42,7 +46,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -78,11 +84,13 @@ public class MainActivity extends AppCompatActivity {
     private Uri uri;
     private String url = "";
 
+    private ListView playerList;
+    private PlayerListAdapter playerListAdapter;
+    private ArrayList<Player> playerDataList = new ArrayList<>();
+
     private Boolean onCreated = false;
 
     private Bitmap bitmap;
-
-    private ArrayList<Player> playerList = new ArrayList<>();
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -111,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
 
         mapButton = (ImageButton)findViewById(R.id.mapButton);
@@ -201,6 +209,38 @@ public class MainActivity extends AppCompatActivity {
         }
         sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         sharedPreferences.edit().clear().commit();
+
+        // create leaderboard array adapter
+        playerList = findViewById(R.id.leaderboard);
+        playerDataList = new ArrayList<>();
+        playerListAdapter = new PlayerListAdapter(this, playerDataList);
+        playerList.setAdapter(playerListAdapter);
+        updateLeaders("pointTotal", 5); // replaces empty leader board
+
+        // create leaderboard sorting buttons
+        Button totalScoreButton = findViewById(R.id.total_score_button);
+        totalScoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateLeaders("pointTotal", 5);
+            }
+        });
+
+        Button totalCodesButton = findViewById(R.id.total_codes_button);
+        totalCodesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateLeaders("totalCodes", 5);
+            }
+        });
+
+        Button mostUniqueButton = findViewById(R.id.most_unique_button);
+        mostUniqueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateLeaders("mostUnique", 5);
+            }
+        });
     }
 
     /**
@@ -208,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
      * details of a specific player profile, including player statistics and a list of all
      * QR Codes which have been collected
      */
-    private void openPlayerCollectionActivity(Player playerToView) {
+    public void openPlayerCollectionActivity(Player playerToView) {
 
         Intent intent = new Intent(this, PlayerCollectionActivity.class);
         intent.putExtra(EXTRA_PLAYER_USERNAME, this.player.getUsername());
@@ -369,6 +409,37 @@ public class MainActivity extends AppCompatActivity {
                 url = task.getResult().get("profileImage").toString();
             }
         });
+    }
+
+    /**
+     * Retrieves a set amount of users at the top of some type of leaderboard
+     */
+    private void updateLeaders(String type, int limit){
+
+        // clear player collection
+        playerDataList.clear();
+
+        // update leaderboard type
+        playerListAdapter.setDisplay(type);
+
+        // update leaderboard values
+        db.collection("users")
+                .orderBy(type, Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        System.out.println("Query Snapshot\n");
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            System.out.println("Document Snapshot\n");
+                            Player newLeader = new Player(doc.get("username").toString());
+                            newLeader.pointTotal = doc.getLong("pointTotal").intValue();
+                            playerDataList.add(newLeader);
+                        }
+                        playerListAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     /**
