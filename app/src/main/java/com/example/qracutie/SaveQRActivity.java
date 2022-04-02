@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -107,6 +108,7 @@ public class SaveQRActivity extends AppCompatActivity {
             @Override
             public void onActivityResult(ActivityResult result) {
                      if(result.getResultCode()== RESULT_OK && result.getData() != null){
+                         Log.d("entered", "onActivityResult: ");
                          Bundle bundle = result.getData().getExtras();
                          Bitmap bitmap = (Bitmap) bundle.get("data");
                          imageView.setImageBitmap(bitmap);
