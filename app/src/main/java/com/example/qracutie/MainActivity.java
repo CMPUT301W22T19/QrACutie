@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String TEXT = "username";
 
+    public static final String EXTRA_PLAYER_USERNAME = "com.example.qracutie.EXTRA_PLAYER_USERNAME";
     public static final String EXTRA_PLAYER_COLLECTION_USERNAME = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_USERNAME";
-    public static final String EXTRA_PLAYER_COLLECTION_ISOWNER = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_ISOWNER";
 
     private Player player;
     private String username = "";
@@ -211,17 +211,8 @@ public class MainActivity extends AppCompatActivity {
     private void openPlayerCollectionActivity(Player playerToView) {
 
         Intent intent = new Intent(this, PlayerCollectionActivity.class);
-
+        intent.putExtra(EXTRA_PLAYER_USERNAME, this.player.getUsername());
         intent.putExtra(EXTRA_PLAYER_COLLECTION_USERNAME, playerToView.getUsername());
-
-        if (playerToView.getUsername().equals(this.player.getUsername())) {
-            // player would like to view their own collection
-            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, true);
-        } else {
-            // player would like to view someone else's collection
-            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, false);
-        }
-
         startActivity(intent);
     }
 

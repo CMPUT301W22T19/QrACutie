@@ -3,6 +3,8 @@ package com.example.qracutie;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +37,7 @@ public class PlayerCollectionActivity extends AppCompatActivity {
     ArrayAdapter<GameQRCode> qrCodeAdapter;
     ArrayList<GameQRCode> qrCodeDataList;
 
+    String viewer;
     Player player;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -46,6 +49,7 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         // load player from db
         Intent intent = getIntent();
+        viewer = intent.getStringExtra(MainActivity.EXTRA_PLAYER_USERNAME);
         String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
         player = new Player(username);
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -76,6 +80,21 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         TextView usernameView = findViewById(R.id.collection_username);
         usernameView.setText(player.getUsername());
 
+        // initialize player statistics
+        setPlayerStats();
+
+        // initialize page with player qr codes
+        qrCodeList = findViewById(R.id.qr_code_list);
+        qrCodeDataList = player.getGameQRCodes();
+        boolean enableOptions = viewer.equals(player.getUsername());
+        qrCodeAdapter = new GameQRCodeAdapter(this, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
+        qrCodeList.setAdapter(qrCodeAdapter);
+    }
+
+    /**
+     * Sets player statistics to be visible on the page
+     */
+    private void setPlayerStats() {
         // initialize page with player statistics
         TextView totalCodes = findViewById(R.id.collection_total_codes_val);
         totalCodes.setText(String.valueOf(player.getTotalCodes()));
@@ -88,21 +107,6 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         TextView lowestScore = findViewById(R.id.collection_lowest_score_val);
         lowestScore.setText(String.valueOf(player.getLowestQRCode()));
-
-
-        // initialize page with player qr codes
-        qrCodeList = findViewById(R.id.qr_code_list);
-        qrCodeDataList = player.getGameQRCodes();
-        qrCodeAdapter = new GameQRCodeAdapter(this, qrCodeDataList, player.getGameQRCodeImages());
-        qrCodeList.setAdapter(qrCodeAdapter);
-
-        // add a click listener for any element of the QR Code list
-        qrCodeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                viewCommentsActivity(qrCodeDataList.get(i));
-            }
-        });
     }
 
     /**
@@ -114,9 +118,35 @@ public class PlayerCollectionActivity extends AppCompatActivity {
      */
     protected void viewCommentsActivity(GameQRCode qrCode) {
         Intent intent = new Intent(this, CommentsPage.class);
-        intent.putExtra(EXTRA_COMMENTS_USERNAME, player.getUsername());
+        intent.putExtra(EXTRA_COMMENTS_USERNAME, viewer);
         intent.putExtra(EXTRA_COMMENTS_QRCODE, qrCode.getHash());
         startActivity(intent);
         return;
+    }
+
+    /**
+     * displays a fragment that shows more information about a QR code,
+     * and allows the player to delete the QR code if they own it
+     */
+    protected void showOptions(GameQRCode qrCode) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder
+            .setMessage("Would you like to delete this QR Code?")
+            .setNegativeButton("No", null)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // remove qr code from player profile
+                    player.deleteGameQRCode(qrCode);
+
+                    // update page statistics
+                    setPlayerStats();
+
+                    // remove qr code from screen
+                    qrCodeAdapter.remove(qrCode);
+                    qrCodeAdapter.notifyDataSetChanged();
+                }
+            }).create().show();
     }
 }
