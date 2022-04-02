@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         playerDataList = new ArrayList<>();
         playerListAdapter = new PlayerListAdapter(this, playerDataList);
         playerList.setAdapter(playerListAdapter);
-        updateLeaders("pointTotal", 5); // replaces empty leader board
+        updateLeaders("pointTotal", 20); // replaces empty leader board
 
         // create leaderboard sorting buttons
         TabLayout leaderboardTabs = findViewById(R.id.leaderboard_tabs);
@@ -434,15 +434,22 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        System.out.println("Query Snapshot\n");
                         for (DocumentSnapshot doc : task.getResult()) {
-                            System.out.println("Document Snapshot\n");
+                            // load player from database
                             Player newLeader = new Player(doc.get("username").toString());
                             newLeader.pointTotal = doc.getLong("pointTotal").intValue();
                             newLeader.totalCodes = doc.getLong("totalCodes").intValue();
                             newLeader.highestQRCode = doc.getLong("highestQRCode").intValue();
+                            if (!doc.getString("profileImage").toString().equals("")) {
+                                newLeader.profileImage = doc.getString("profileImage").toString();
+                            } else {
+                                newLeader.profileImage = "";
+                            }
+
+                            // add player to data list
                             playerDataList.add(newLeader);
                         }
+                        // update leaderboard
                         playerListAdapter.notifyDataSetChanged();
                     }
                 });

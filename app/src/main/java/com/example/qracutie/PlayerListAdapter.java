@@ -3,6 +3,7 @@ package com.example.qracutie;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +40,11 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
         this.players = players;
     }
 
+    /**
+     * Sets a specific display "type" so that the adapter knows wether to print
+     * the player's total points, total codes, or highest score
+     * @param display the type of player attribute to display
+     */
     public void setDisplay(String display) {
         this.display = display;
     }
@@ -61,7 +70,15 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
 
         // set player image
         ImageView playerImage = view.findViewById(R.id.player_list_image);
-        playerImage.setImageBitmap(player.getProfilePic());
+        Glide.with(context).clear(playerImage);
+        if (!player.getProfileImage().equals("")) {
+            Glide.with(context).asBitmap().load(Uri.parse(player.getProfileImage()))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(playerImage);
+        } else {
+            playerImage.setImageResource(R.drawable.default_profile_pic);
+        }
 
         // set player username
         TextView playerUsername = view.findViewById(R.id.player_list_name);
