@@ -13,12 +13,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
@@ -27,11 +29,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.function.Consumer;
 
 /**
@@ -43,6 +54,10 @@ import java.util.function.Consumer;
 public class SaveQRActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("gameQRCodeImages");
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+    private String username = "";
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
@@ -51,14 +66,18 @@ public class SaveQRActivity extends AppCompatActivity {
     double scannedLongitude;
     Boolean boxChecked = false;
     ImageView imageView;
+    String currentPhotoPath;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
 
         imageView = findViewById(R.id.QRView);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT, "");
 
 
         Intent intent = getIntent();
@@ -91,6 +110,7 @@ public class SaveQRActivity extends AppCompatActivity {
                          Bundle bundle = result.getData().getExtras();
                          Bitmap bitmap = (Bitmap) bundle.get("data");
                          imageView.setImageBitmap(bitmap);
+                         uploadQRImage(bitmap);
                      }
             }
         });
@@ -100,6 +120,7 @@ public class SaveQRActivity extends AppCompatActivity {
                 Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (intent1.resolveActivity(getPackageManager()) != null) {
                     activityResultLauncher.launch(intent1);
+
                 } else {
                     Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
                 }
@@ -118,6 +139,27 @@ public class SaveQRActivity extends AppCompatActivity {
             startActivity(intentMain);
         });
     }
+
+    /**
+     * Begins the process of uploading the player's profile image to firebase storage
+     * @param bitmap
+     */
+    private void uploadQRImage(Bitmap bitmap){
+        // From: Youtube
+        // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
+        // Author: yoursTruly
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+        storageReference.child(username).child(scannedQrCode.getHash()).putBytes(stream.toByteArray()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_SHORT);
+            }
+        });
+    }
+
+
 
     private void isUniqueCheck(){
         db.collection("GameQRCodes").document(scannedQrCode.getHash()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
