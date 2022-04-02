@@ -6,7 +6,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -75,11 +79,10 @@ public class MainActivity extends AppCompatActivity {
     private String profile_image = "profileImage";
     private String profile_image_uri = "";
     private String profile_image_stored = "";
-    private Uri uri;
     private String url = "";
 
     private Boolean onCreated = false;
-
+    private Uri uri;
     private Bitmap bitmap;
 
     private ArrayList<Player> playerList = new ArrayList<>();
@@ -111,10 +114,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
 
-        mapButton = (ImageButton)findViewById(R.id.mapButton);
+        mapButton = (ImageButton) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(view.getContext(), CameraActivity.class);
             view.getContext().startActivity(intent);});
 
+      playerExistence();
+    }
+
+    private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
         // if username isn't stored in shared preferences, then generate a username
@@ -156,51 +163,88 @@ public class MainActivity extends AppCompatActivity {
             generateUniqueUsername();
         }else{
             // user already exists in the database
-            nameDisplayed.setText(username);
-            player = new Player(username);
             getPlayerInfo();
-            // From: Youtube
-            // URL: https://www.youtube.com/watch?v=xzCsJF9WtPU&ab_channel=EasyLearn
-            // Author: EasyLearn
-            StorageReference ref = storageReference.child(username+".jpeg");
-            try {
-                final File localFile = File.createTempFile(username, ".jeg");
-                ref.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        Bitmap bmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                        float fwidth = bmap.getWidth();
-                        float fheight = bmap.getHeight();
-                        float ratio;
-                        Integer width;
-                        Integer height;
-                        if(fwidth < fheight){
-                            ratio = fwidth/120;
-                            fheight = fheight/ratio;
-                            width = 120;
-                            height = (Integer) Math.round(fheight);
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
-                        }else if(fheight < fwidth){
-                            ratio = fheight/120;
-                            fwidth = fwidth/ratio;
-                            width = (Integer) Math.round(fwidth);
-                            height = 120;
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
-                        }else{
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, 120, 120, false));
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        sharedPreferences.edit().clear().commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent = getIntent();
+        String prevActivity = intent.getStringExtra("activity");
+        if(prevActivity != null && prevActivity.toString().equals("ownerspage")){
+            playerExistence();
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        if(menu instanceof MenuBuilder){
+            MenuBuilder m = (MenuBuilder) menu;
+            m.setOptionalIconsVisible(true);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.owner_login_button){
+            Intent intent = new Intent(MainActivity.this, OwnerLogin.class);
+            intent.putExtra("username", player.getUsername());
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * gets the existing player's profile image from Firebase Storage
+     */
+    private void getProfileImage(){
+        // From: Youtube
+        // URL: https://www.youtube.com/watch?v=xzCsJF9WtPU&ab_channel=EasyLearn
+        // Author: EasyLearn
+        StorageReference ref = storageReference.child(username+".jpeg");
+        try {
+            final File localFile = File.createTempFile(username, ".jeg");
+            ref.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    Bitmap bmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                    float fwidth = bmap.getWidth();
+                    float fheight = bmap.getHeight();
+                    float ratio;
+                    Integer width;
+                    Integer height;
+                    if(fwidth < fheight){
+                        ratio = fwidth/120;
+                        fheight = fheight/ratio;
+                        width = 120;
+                        height = (Integer) Math.round(fheight);
+                        profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
+                    }else if(fheight < fwidth){
+                        ratio = fheight/120;
+                        fwidth = fwidth/ratio;
+                        width = (Integer) Math.round(fwidth);
+                        height = 120;
+                        profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
+                    }else{
+                        profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, 120, 120, false));
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -314,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
      * Creates the player in Firebase
      */
     private void createNewUser(){
+        nameDisplayed.setText(username);
         player = new Player(username);
         db.collection("users").document(username).set(player);
     }
@@ -371,11 +416,18 @@ public class MainActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                player.setEmail(task.getResult().get("email").toString());
-                player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
-                email = player.getEmail();
-                phonenumber = player.getPhoneNumber();
-                url = task.getResult().get("profileImage").toString();
+                if(task.getResult().exists()){
+                    nameDisplayed.setText(username);
+                    player = new Player(username);
+                    player.setEmail(task.getResult().get("email").toString());
+                    player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
+                    email = player.getEmail();
+                    phonenumber = player.getPhoneNumber();
+                    url = task.getResult().get("profileImage").toString();
+                    getProfileImage();
+                }else{
+                    generateUniqueUsername();
+                }
             }
         });
     }

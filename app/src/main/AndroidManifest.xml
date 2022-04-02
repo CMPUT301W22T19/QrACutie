@@ -5,6 +5,7 @@
 
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:ignore="CoarseFineLocation"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-feature android:name="android.hardware.camera"
@@ -63,6 +64,8 @@
             android:label="CommentsPage"
             android:exported="true" />
         <activity android:name=".Account"></activity>
+        <activity android:name=".OwnerLogin"></activity>
+        <activity android:name=".OwnerAllPlayers"></activity>
     </application>
 
 </manifest>
