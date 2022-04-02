@@ -34,6 +34,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -218,27 +220,29 @@ public class MainActivity extends AppCompatActivity {
         updateLeaders("pointTotal", 5); // replaces empty leader board
 
         // create leaderboard sorting buttons
-        Button totalScoreButton = findViewById(R.id.total_score_button);
-        totalScoreButton.setOnClickListener(new View.OnClickListener() {
+        TabLayout leaderboardTabs = findViewById(R.id.leaderboard_tabs);
+        leaderboardTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View view) {
-                updateLeaders("pointTotal", 5);
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch(tab.getPosition()) {
+                    case 0:
+                        updateLeaders("pointTotal", 5);
+                        break;
+                    case 1:
+                        updateLeaders("totalCodes", 5);
+                        break;
+                    case 2:
+                        updateLeaders("mostUnique", 5);
+                        break;
+                }
             }
-        });
 
-        Button totalCodesButton = findViewById(R.id.total_codes_button);
-        totalCodesButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                updateLeaders("totalCodes", 5);
+            public void onTabUnselected(TabLayout.Tab tab) {
             }
-        });
 
-        Button mostUniqueButton = findViewById(R.id.most_unique_button);
-        mostUniqueButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                updateLeaders("mostUnique", 5);
+            public void onTabReselected(TabLayout.Tab tab) {
             }
         });
     }
