@@ -33,7 +33,7 @@ public class PlayerCollectionActivityTest {
                 protected Intent getActivityIntent (){
                     Intent intent = new Intent();
                     intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME,"user042580");
-                    intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_ISOWNER, true);
+                    intent.putExtra(MainActivity.EXTRA_PLAYER_USERNAME, "user042580");
                     return intent;
                 }
             };

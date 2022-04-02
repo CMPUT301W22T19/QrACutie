@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.concurrent.ExecutionException;
 
+
 /**
  * Activity that calls the camera in order to scan a QR Code
  * Allows a player to scan QR codes and also capture images
