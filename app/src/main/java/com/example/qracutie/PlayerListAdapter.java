@@ -69,18 +69,27 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
 
         // set player score
         TextView playerScore = view.findViewById(R.id.player_list_score);
-        if (display.equals("pointTotal")) {
-            playerScore.setText(String.valueOf(player.getPointTotal()));
-        } else if (display.equals("totalCodes")){
-            playerScore.setText(String.valueOf(player.getTotalCodes()));
-        } else {
-            // TODO implement
-            playerScore.setText("missing");
+        String score = "";
+        switch (display) {
+            case "pointTotal":
+                //playerScore.setText(String.valueOf(player.getPointTotal()));
+                score = String.valueOf(player.getPointTotal());
+                break;
+            case "totalCodes":
+                //playerScore.setText(String.valueOf(player.getTotalCodes()));
+                score = String.valueOf(player.getTotalCodes());
+                break;
+            case "highestQRCode":
+                //playerScore.setText(String.valueOf(player.getHighestQRCode()));
+                score = String.valueOf(player.getHighestQRCode());
+                break;
         }
+        playerScore.setText(score);
 
         // set player rank
         TextView playerRank = view.findViewById(R.id.player_list_rank);
-        playerRank.setText(String.valueOf(position + 1));
+        String rank = "#" + String.valueOf(position + 1);
+        playerRank.setText(rank);
 
         // set click listener on entire view
         view.setOnClickListener(new View.OnClickListener() {

@@ -226,13 +226,13 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 switch(tab.getPosition()) {
                     case 0:
-                        updateLeaders("pointTotal", 5);
+                        updateLeaders("pointTotal", 20);
                         break;
                     case 1:
-                        updateLeaders("totalCodes", 5);
+                        updateLeaders("totalCodes", 20);
                         break;
                     case 2:
-                        updateLeaders("mostUnique", 5);
+                        updateLeaders("highestQRCode", 20);
                         break;
                 }
             }
@@ -439,6 +439,8 @@ public class MainActivity extends AppCompatActivity {
                             System.out.println("Document Snapshot\n");
                             Player newLeader = new Player(doc.get("username").toString());
                             newLeader.pointTotal = doc.getLong("pointTotal").intValue();
+                            newLeader.totalCodes = doc.getLong("totalCodes").intValue();
+                            newLeader.highestQRCode = doc.getLong("highestQRCode").intValue();
                             playerDataList.add(newLeader);
                         }
                         playerListAdapter.notifyDataSetChanged();

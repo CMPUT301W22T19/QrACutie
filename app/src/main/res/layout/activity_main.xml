@@ -126,10 +126,10 @@
                 android:text="Total Codes" />
 
             <com.google.android.material.tabs.TabItem
-                android:id="@+id/most_unique_button"
+                android:id="@+id/highest_score_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Most Unique" />
+                android:text="Highest Score" />
 
         </com.google.android.material.tabs.TabLayout>
     </RelativeLayout>
