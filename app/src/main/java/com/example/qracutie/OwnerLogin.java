@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class OwnerLogin extends AppCompatActivity {
     private Button log_in_clicked;
+    private Button reset_password;
     private String username;
     private FirebaseAuth mAuth;
     private EditText email;
@@ -40,6 +41,31 @@ public class OwnerLogin extends AppCompatActivity {
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
         log_in_clicked = (Button) findViewById(R.id.owner_login);
+        reset_password = (Button) findViewById(R.id.reset_password);
+        // From: stackoverflow
+        // URL: https://stackoverflow.com/a/44260541
+        // Author: mohit singh
+        reset_password.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                emailstr = email.getText().toString();
+                if (!emailstr.equals("")) {
+                    mAuth.sendPasswordResetEmail(emailstr).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(getApplicationContext(), "Password reset email sent", Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }else{
+                    Toast.makeText(getApplicationContext(), "Please input your email", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         log_in_clicked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

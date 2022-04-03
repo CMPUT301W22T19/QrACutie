@@ -5,10 +5,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,36 +48,6 @@ public class OwnerQRRecyclerviewAdapter extends RecyclerView.Adapter<OwnerQRRecy
                 notifyItemRangeChanged(position, QRNames.size());
             }
         });
-        //holder.itemView.setSelected(true);
-
-        // From: YouTube
-        // URL: https://www.youtube.com/watch?v=hYWk4m-7mwA&ab_channel=EDMTDev
-        // Author: EDMT Dev
-
-        // From: stackoverflow
-        // URL: https://stackoverflow.com/a/59344531
-        // Author: Hamed Rahimi
-        /*holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //notifyDataSetChanged();
-                //QRNames.remove(position);
-                //Toast.makeText(context.getApplicationContext(), Integer.toString(selected), Toast.LENGTH_SHORT).show();
-                //notifyItemRemoved(position);
-                //notifyItemRangeChanged(position, QRNames.size());
-            }
-        });*/
-        /*if(selected == position){
-            holder.itemView.setBackgroundColor(Color.parseColor("#0000FF"));
-        }else{
-            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
-        }
-        holder.button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });*/
     }
 
     private void remFromDat(int pos){

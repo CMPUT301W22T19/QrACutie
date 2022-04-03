@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginTop="50dp"
     android:id="@+id/QR_recycler_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="30dp">
+    android:padding="30dp"
+    android:background="@drawable/border">
     <TextView
+        android:text="jhdjhdghfg"
         android:id="@+id/QR_string_list_item"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="30dp"
-        android:textSize="17sp"/>
-    <Button
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/open_sans"/>
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/del_Qr_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/QR_string_list_item"
         android:layout_centerVertical="true"
         android:layout_marginLeft="30dp"
-        android:text="Delete"/>
+        android:text="Delete"
+        android:textColor="#513CF6"
+        android:fontFamily="@font/open_sans_semibold"
+        android:textSize="20sp"
+        android:background="@android:color/transparent"/>
 </RelativeLayout>

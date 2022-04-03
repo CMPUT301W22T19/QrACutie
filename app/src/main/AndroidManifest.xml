@@ -38,6 +38,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <activity
             android:name=".MapsActivity"
@@ -66,6 +69,7 @@
         <activity android:name=".Account"></activity>
         <activity android:name=".OwnerLogin"></activity>
         <activity android:name=".OwnerAllPlayers"></activity>
+        <activity android:name=".SearchPlayer"></activity>
     </application>
 
 </manifest>

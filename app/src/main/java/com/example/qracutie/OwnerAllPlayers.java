@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Layout;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -82,7 +83,7 @@ public class OwnerAllPlayers extends AppCompatActivity {
                         }
                     }
                     if(playerNames.size() == numPlayers){
-                        recyclerViewToScreen();
+                        recyclerViewToScreen(numPlayers);
                     }
                 }
             }
@@ -103,7 +104,8 @@ public class OwnerAllPlayers extends AppCompatActivity {
         });
     }
 
-    private void recyclerViewToScreen(){
+    private void recyclerViewToScreen(Integer num){
+        Toast.makeText(getApplicationContext(), Integer.toString(num), Toast.LENGTH_SHORT).show();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         adapter = new OwnerRecyclerviewAdapter(username, playerNames, playerImages, getApplicationContext());
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
