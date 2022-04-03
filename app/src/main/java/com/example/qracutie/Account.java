@@ -1,6 +1,7 @@
 package com.example.qracutie;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * their player profile, such as email and phone number
  */
 public class Account extends AppCompatActivity {
+
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
+
     private EditText newEmail;
     private EditText newPhonenumber;
     private Button done;
@@ -27,6 +35,9 @@ public class Account extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT, "");
 
         Intent intent = getIntent();
 
@@ -50,5 +61,15 @@ public class Account extends AppCompatActivity {
            }
        });
 
+    }
+
+    /**
+     * Onclick method for when the user accesses their account info (email and phone number)
+     * @param view
+     */
+    public void userQrButtonClicked(View view) {
+        Intent intent = new Intent(Account.this, ShareableQrActivity.class);
+        intent.putExtra(EXTRA_COMMENTS_TYPE, "login");
+        startActivityIfNeeded(intent, 255);
     }
 }

@@ -48,7 +48,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class MainActivity extends AppCompatActivity {
 
-    public static final String EXTRA_COMMENTS_USERNAME = "com.example.qracutie.EXTRA_COMMENTS_USERNAME";
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
 
     private Button userAccountButton;
     private ImageButton userQrButton;
@@ -385,16 +385,6 @@ public class MainActivity extends AppCompatActivity {
     public void userAccountButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this,Account.class);
 
-        startActivityIfNeeded(intent, 255);
-    }
-
-    /**
-     * Onclick method for when the user accesses their account info (email and phone number)
-     * @param view
-     */
-    public void userQrButtonClicked(View view) {
-        Intent intent = new Intent(MainActivity.this, ShareableQrActivity.class);
-        intent.putExtra(EXTRA_COMMENTS_USERNAME, username);
         startActivityIfNeeded(intent, 255);
     }
 

@@ -1,6 +1,7 @@
 package com.example.qracutie;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -21,6 +22,13 @@ import androidmads.library.qrgenearator.QRGEncoder;
 // https://www.geeksforgeeks.org/how-to-generate-qr-code-in-android/
 public class ShareableQrActivity extends AppCompatActivity {
 
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
+    private String qrType = "";
+
     // variables for imageview, edittext,
     // button, bitmap and qrencoder.
     private ImageView qrCodeIV;
@@ -34,12 +42,15 @@ public class ShareableQrActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shareable_qr);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT, "");
+
         // get intent from caller class
         Intent intent = getIntent();
-        String username = intent.getStringExtra(PlayerCollectionActivity.EXTRA_COMMENTS_USERNAME);
+        qrType = intent.getStringExtra(EXTRA_COMMENTS_TYPE);
 
         // create encoding string
-        String toEncode = "User_Identifier:" + username;
+        String toEncode = qrType + ":" + username;
 
         // initializing all variables.
         qrCodeIV = findViewById(R.id.idIVQrcode);
