@@ -73,8 +73,8 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
         Glide.with(context).clear(playerImage);
         if (!player.getProfileImage().equals("")) {
             Glide.with(context).asBitmap().load(Uri.parse(player.getProfileImage()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE) // Remove this to achieve faster image loading, but less accurate
+                    .skipMemoryCache(true) // Remove this to achieve faster image loading, but less accurate
                     .into(playerImage);
         } else {
             playerImage.setImageResource(R.drawable.default_profile_pic);

@@ -91,10 +91,23 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Defines an onCallBack method for initializing the collections page with data
+     */
     private interface MyCallBack {
+        /**
+         * Initializes the player collections page with data
+         */
         void onCallBack(Context context, Player player);
     }
 
+    /**
+     * Loads a user profile in from firebase, including all user statistics, user QR codes,
+     * and images associated to QR codes. Accepts a callback.
+     * @param context context of caller
+     * @param username profile to load from firestore
+     * @param myCallBack a callback class
+     */
     private void loadUser(Context context, String username, MyCallBack myCallBack) {
         player = new Player(username);
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {

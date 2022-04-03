@@ -420,9 +420,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateLeaders(String type, int limit){
 
-        // wait until player is loaded from db
-        while(player != null);
-
         // clear player collection
         playerDataList.clear();
 
