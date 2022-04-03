@@ -22,6 +22,7 @@ public class GameQRCode {
     public GameQRCode(String hash, int points) {
         this.hash = hash;
         this.points = points;
+        this.amountOfScans = 1;
     }
 
     /**
@@ -36,6 +37,7 @@ public class GameQRCode {
         this.points = points;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.amountOfScans = 1;
     }
 
     /**
@@ -66,6 +68,11 @@ public class GameQRCode {
     public int getAmountOfScans() {
         return amountOfScans;
     }
+
+    /**
+     * Increments the amount of scans of the QR Code by 1
+     */
+    public void incrementAmountOfScans() { this.amountOfScans++; }
 
     /**
      * Returns the list of comments for this QR Code
