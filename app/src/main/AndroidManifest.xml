@@ -53,6 +53,7 @@
             android:exported="false" />
         <activity
             android:name=".SaveImageActivity"
+            android:parentActivityName=".SaveQRActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
