@@ -76,12 +76,16 @@ public class SaveQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
 
+
+        Intent intent = getIntent();
+        String username1 = intent.getStringExtra("username");
+
+
         imageView = findViewById(R.id.QRView);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT, "");
 
 
-        Intent intent = getIntent();
         String qrCodeString = intent.getStringExtra("qrcode");
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
@@ -104,30 +108,41 @@ public class SaveQRActivity extends AppCompatActivity {
 
         // uses built-in camera to save image
         Button captureQR = (Button) findViewById(R.id.CapturePic);
-        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-            @Override
-            public void onActivityResult(ActivityResult result) {
-                     if(result.getResultCode()== RESULT_OK && result.getData() != null){
-                         Log.d("entered", "onActivityResult: ");
-                         Bundle bundle = result.getData().getExtras();
-                         Bitmap bitmap = (Bitmap) bundle.get("data");
-                         imageView.setImageBitmap(bitmap);
-                         uploadQRImage(bitmap);
-                     }
-            }
-        });
+//        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+//            @Override
+//            public void onActivityResult(ActivityResult result) {
+//                     if(result.getResultCode()== RESULT_OK && result.getData() != null){
+//                         Log.d("entered", "onActivityResult: ");
+//                         Bundle bundle = result.getData().getExtras();
+//                         Bitmap bitmap = (Bitmap) bundle.get("data");
+//                         imageView.setImageBitmap(bitmap);
+//                         uploadQRImage(bitmap);
+//                     }
+//            }
+//        });
         captureQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent1.resolveActivity(getPackageManager()) != null) {
-                    activityResultLauncher.launch(intent1);
-
-                } else {
-                    Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
-                }
+                Intent intent = new Intent(view.getContext(), SaveImageActivity.class);
+                intent.putExtra("QRHash",scannedQrCode.getHash());
+                intent.putExtra("username",username1);
+                startActivity(intent);
             }
         });
+//        captureQR.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//
+//                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                if (intent1.resolveActivity(getPackageManager()) != null) {
+//                    activityResultLauncher.launch(intent1);
+//
+//                } else {
+//                    Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
 
         Button done = findViewById(R.id.done_button);
         done.setOnClickListener(view -> {
@@ -144,22 +159,21 @@ public class SaveQRActivity extends AppCompatActivity {
 
     /**
      * Begins the process of uploading the player's profile image to firebase storage
-     * @param bitmap
      */
-    private void uploadQRImage(Bitmap bitmap){
-        // From: Youtube
-        // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
-        // Author: yoursTruly
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-
-        storageReference.child(username).child(scannedQrCode.getHash()).putBytes(stream.toByteArray()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_SHORT);
-            }
-        });
-    }
+//    private void uploadQRImage(Bitmap bitmap){
+//        // From: Youtube
+//        // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
+//        // Author: yoursTruly
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//
+//        storageReference.child(username).child(scannedQrCode.getHash()).putBytes(stream.toByteArray()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_SHORT);
+//            }
+//        });
+//    }
 
 
 
@@ -248,7 +262,7 @@ public class SaveQRActivity extends AppCompatActivity {
         }
     }
 
-    private int charToInt(char ch)
+    private static int charToInt(char ch)
     {
         if (ch >= '0' && ch <= '9')
             return ch - '0';
@@ -259,7 +273,7 @@ public class SaveQRActivity extends AppCompatActivity {
         return -1;
     }
 
-    private int computeHashScore(String hash) {
+    static int computeHashScore(String hash) {
         int points = 0;
         int indexIncrement = 0;
         char currChar;

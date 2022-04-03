@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         Button button1 = (Button)findViewById(R.id.cameraButton);
         button1.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), CameraActivity.class);
+            intent.putExtra("username", this.player.getUsername());
             view.getContext().startActivity(intent);});
 
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);

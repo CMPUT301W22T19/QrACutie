@@ -51,6 +51,8 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("username");
         setContentView(R.layout.activity_camera);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -66,7 +68,9 @@ public class CameraActivity extends AppCompatActivity {
                 //String hash = sha256(qrCode);
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
+                intent.putExtra("username",username);
                 intent.putExtra("qrcode", qrCode);
+
                 v.getContext().startActivity(intent);
             }
         });
