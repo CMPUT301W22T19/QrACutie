@@ -1,6 +1,7 @@
 package com.example.qracutie;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -53,6 +54,19 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         // load player from db
         Intent intent = getIntent();
         String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+
+        // Get current user's username
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String currentUser = sharedPreferences.getString(TEXT, "");
+
+        // If the user being shown and the current user are not the same, hide the shareable qr code button
+        if (!username.equals(currentUser)) {
+
+            View b = findViewById(R.id.user_qr_button);
+            b.setVisibility(View.GONE);
+        }
+
+
         player = new Player(username);
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
