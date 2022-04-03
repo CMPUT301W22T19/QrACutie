@@ -17,18 +17,31 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
         android:orientation="vertical">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/mapButton"
+            app:searchIcon="@drawable/search" />
+
         // From: stackoverflow
         // URL: https://stackoverflow.com/a/35287222
         // Author: shreedhar bhat
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profile"
             android:layout_width="120dp"
             android:layout_height="120dp"
-
             android:layout_marginTop="90dp"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="250dp">
+            app:cardCornerRadius="250dp"
+            app:strokeColor="@color/white"
+            app:strokeWidth="1dp">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
@@ -41,34 +54,44 @@
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/default_profile" />
+                    android:src="@drawable/default_profile_pic" />
             </androidx.cardview.widget.CardView>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/display_name"
             android:layout_width="200dp"
             android:layout_height="60dp"
-            android:layout_marginLeft="130dp"
-            android:layout_marginTop="130dp" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="130dp"
+            android:layout_toRightOf="@+id/profile"
+            android:fontFamily="@font/open_sans"
+            android:textColor="@color/white"
+            android:textSize="25dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/user_account_button"
-            android:layout_width="110dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="220dp"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/profile"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button"
+            android:fontFamily="@font/open_sans_semibold"
             android:onClick="userAccountButtonClicked"
-            android:text="Account" />
+            android:text="Account"
+            android:textColor="@color/white" />
 
-        <ImageButton
-            android:id="@+id/mapButton"
-            android:layout_width="42dp"
-            android:layout_height="35dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="25dp"
-            android:background="@android:drawable/ic_dialog_map" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/collection_button"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/user_account_button"
+            android:layout_marginStart="-2dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button"
+            android:fontFamily="@font/open_sans_semibold"
+            android:text="Collection"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/cameraButton"
@@ -77,24 +100,18 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="7dp"
-            android:layout_marginRight="7dp"
-            android:layout_marginBottom="-2dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/ic_baseline_photo_camera_24" />
 
-        <Button
-            android:id="@+id/collection_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/user_account_button"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="-2dp"
-            android:layout_marginTop="12dp"
-            android:text="Collection" />
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="280dp"
-        android:text="Collection"/>
+        <ImageButton
+            android:id="@+id/mapButton"
+            android:layout_width="42dp"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
+            android:background="@android:drawable/ic_dialog_map" />
+
     </RelativeLayout>
 
 </RelativeLayout>
