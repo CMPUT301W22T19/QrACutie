@@ -49,7 +49,10 @@ public class SaveImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String username1 = intent.getStringExtra("username");
         String qrCodeHash = intent.getStringExtra("QRHash");
-
+        double latitude= intent.getDoubleExtra("Latitude",0);
+        double longitude= intent.getDoubleExtra("Longitude",0);
+        Double lat = latitude;
+        Double longt = longitude;
 
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("gameQRcodeImages/"+username1);
@@ -87,6 +90,10 @@ public class SaveImageActivity extends AppCompatActivity {
         SaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (lat != null && longt != null){
+                    scannedQrCode.setLatitude(latitude);
+                    scannedQrCode.setLongitude(longitude);
+                }
                 Intent intent = new Intent(SaveImageActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
