@@ -12,12 +12,12 @@
 
     <ImageButton
         android:id="@+id/user_qr_button"
-        android:layout_width="42dp"
-        android:layout_height="35dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="25dp"
-        android:background="@android:drawable/ic_dialog_map"
+        android:background="@drawable/qr_code_icon"
         android:onClick="userQrButtonClicked"
         android:text="QR" />
 
@@ -27,9 +27,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".Account"
         android:gravity="center">
-
-
-
+        
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">

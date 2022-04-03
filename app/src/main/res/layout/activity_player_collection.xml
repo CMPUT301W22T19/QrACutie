@@ -37,12 +37,12 @@
 
     <ImageButton
         android:id="@+id/user_qr_button"
-        android:layout_width="42dp"
-        android:layout_height="35dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="216dp"
+        android:layout_marginStart="208dp"
         android:layout_marginTop="16dp"
-        android:background="@android:drawable/ic_dialog_map"
+        android:background="@drawable/qr_code_icon"
         android:onClick="userQrButtonClicked"
         android:text="QR"
         app:layout_constraintStart_toEndOf="@+id/cardView"
