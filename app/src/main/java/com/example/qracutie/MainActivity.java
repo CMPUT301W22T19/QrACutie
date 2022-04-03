@@ -217,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
         playerDataList = new ArrayList<>();
         playerListAdapter = new PlayerListAdapter(this, playerDataList);
         playerList.setAdapter(playerListAdapter);
-        updateLeaders("pointTotal", 20); // replaces empty leader board
 
         // create leaderboard sorting buttons
         TabLayout leaderboardTabs = findViewById(R.id.leaderboard_tabs);
@@ -226,13 +225,16 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 switch(tab.getPosition()) {
                     case 0:
-                        updateLeaders("pointTotal", 20);
+                        updateRank("pointTotal");
+                        updateLeaders("pointTotal", 10);
                         break;
                     case 1:
-                        updateLeaders("totalCodes", 20);
+                        updateRank("totalCodes");
+                        updateLeaders("totalCodes", 10);
                         break;
                     case 2:
-                        updateLeaders("highestQRCode", 20);
+                        updateRank("highestQRCode");
+                        updateLeaders("highestQRCode", 10);
                         break;
                 }
             }
@@ -245,6 +247,12 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+
+        // set the user's rank
+        updateRank("pointTotal");
+
+        // set the leaderboard
+        updateLeaders("pointTotal", 10); // replaces empty leader board
     }
 
     /**
@@ -436,7 +444,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         int rank = 1;
-                        int upperBound = 0;
                         String rankText = "#";
 
                         for (DocumentSnapshot doc : task.getResult()) {
@@ -454,19 +461,6 @@ public class MainActivity extends AppCompatActivity {
                             // add player to data list
                             playerDataList.add(newLeader);
 
-                            // update upperbound value
-                            switch (type) {
-                                case "pointTotal":
-                                    upperBound = Math.max(upperBound, newLeader.getPointTotal());
-                                    break;
-                                case "totalCodes":
-                                    upperBound = Math.max(upperBound, newLeader.getTotalCodes());
-                                    break;
-                                case "highestQRCode":
-                                    upperBound = Math.max(upperBound, newLeader.getHighestQRCode());
-                                    break;
-                            }
-
                             // update user rank
                             if (newLeader.getUsername().equals(username)) {
                                 rankText += String.valueOf(rank);
@@ -479,16 +473,64 @@ public class MainActivity extends AppCompatActivity {
                         playerListAdapter.notifyDataSetChanged();
 
                         // if user rank was not updated, get an estimate for user rank
-                        if (rankText.equals("#")) {
-                            rank += 20;
-                            rankText += String.valueOf(rank);
+                        if (!rankText.equals("#")) {
+                            // display user rank
+                            TextView playerRank = findViewById(R.id.player_rank);
+                            playerRank.setText(rankText);
                         }
-
-                        // display user rank
-                        TextView playerRank = findViewById(R.id.player_rank);
-                        playerRank.setText(rankText);
                     }
                 });
+    }
+
+    /**
+     * Retrieves a rank for the user based on firebase ranking map. Updates firebase rankings
+     * if no update has occurred within the past hour
+     */
+    private void updateRank(String type) {
+        // check when time of last update was
+        db.collection("rankings").document(type).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //HashMap<String, Integer> rankings = (HashMap<String, Integer>) task.getResult().get("ranks");
+                int lastUpdate = task.getResult().getLong("lastUpdate").intValue();
+                int currentTime = (int) (System.currentTimeMillis() / 1000);
+
+                // if last update is less than an hour before the current time,
+                // set the user rank. Otherwise, update all user rankings
+                if (currentTime - lastUpdate < 3600 && task.getResult().get(username) != null) {
+                    // set rankings value
+                    TextView playerRank = findViewById(R.id.player_rank);
+                    String rankText = "#" + task.getResult().get(username);
+                    playerRank.setText(rankText);
+                } else {
+                    db.collection("users")
+                            .orderBy(type, Query.Direction.DESCENDING)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> qstask) {
+
+                                    // build rankings hashmap
+                                    int rank = 1;
+                                    HashMap<String, Integer> map = new HashMap<>();
+                                    map.put("lastUpdate", currentTime);
+
+                                    for (DocumentSnapshot doc : qstask.getResult()) {
+                                        map.put(doc.get("username").toString(), rank++);
+                                    }
+
+                                    // save hashmap to database
+                                    db.collection("rankings").document(type).set(map);
+
+                                    // display user rank
+                                    TextView playerRank = findViewById(R.id.player_rank);
+                                    String rankText = "#" + map.get(username);
+                                    playerRank.setText(rankText);
+                                }
+                            });
+                }
+            }
+        });
     }
 
     /**
