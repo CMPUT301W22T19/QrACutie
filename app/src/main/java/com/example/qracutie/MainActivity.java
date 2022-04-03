@@ -420,6 +420,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void updateLeaders(String type, int limit){
 
+        // wait until player is loaded from db
+        while(player != null);
+
         // clear player collection
         playerDataList.clear();
 
@@ -434,6 +437,11 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        int rank = 1;
+                        int upperBound = 0;
+                        String rankText = "#";
+
                         for (DocumentSnapshot doc : task.getResult()) {
                             // load player from database
                             Player newLeader = new Player(doc.get("username").toString());
@@ -448,9 +456,40 @@ public class MainActivity extends AppCompatActivity {
 
                             // add player to data list
                             playerDataList.add(newLeader);
+
+                            // update upperbound value
+                            switch (type) {
+                                case "pointTotal":
+                                    upperBound = Math.max(upperBound, newLeader.getPointTotal());
+                                    break;
+                                case "totalCodes":
+                                    upperBound = Math.max(upperBound, newLeader.getTotalCodes());
+                                    break;
+                                case "highestQRCode":
+                                    upperBound = Math.max(upperBound, newLeader.getHighestQRCode());
+                                    break;
+                            }
+
+                            // update user rank
+                            if (newLeader.getUsername().equals(username)) {
+                                rankText += String.valueOf(rank);
+                            }
+                            // increment rank
+                            rank++;
+
                         }
                         // update leaderboard
                         playerListAdapter.notifyDataSetChanged();
+
+                        // if user rank was not updated, get an estimate for user rank
+                        if (rankText.equals("#")) {
+                            rank += 20;
+                            rankText += String.valueOf(rank);
+                        }
+
+                        // display user rank
+                        TextView playerRank = findViewById(R.id.player_rank);
+                        playerRank.setText(rankText);
                     }
                 });
     }

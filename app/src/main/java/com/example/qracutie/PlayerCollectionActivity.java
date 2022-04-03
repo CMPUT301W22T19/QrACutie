@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,6 +42,8 @@ public class PlayerCollectionActivity extends AppCompatActivity {
     ArrayList<GameQRCode> qrCodeDataList;
 
     String viewer;
+    String personToView;
+
     Player player;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -50,45 +56,68 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         // load player from db
         Intent intent = getIntent();
         viewer = intent.getStringExtra(MainActivity.EXTRA_PLAYER_USERNAME);
-        String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+        personToView = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+
+        // load player from database
+        loadUser(this, personToView, new MyCallBack() {
+            @Override
+            public void onCallBack(Context context, Player player) {
+                // initialize player username
+                TextView usernameView = findViewById(R.id.collection_username);
+                usernameView.setText(player.getUsername());
+
+                // initialize player image
+                ImageView playerImage = findViewById(R.id.collection_player_image);
+                Glide.with(context).clear(playerImage);
+                if (!player.getProfileImage().equals("")) {
+                    Glide.with(context).asBitmap().load(Uri.parse(player.getProfileImage()))
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .into(playerImage);
+                } else {
+                    playerImage.setImageResource(R.drawable.default_profile_pic);
+                }
+
+                // initialize player statistics
+                setPlayerStats();
+
+                // initialize page with player qr codes
+                qrCodeList = findViewById(R.id.qr_code_list);
+                qrCodeDataList = player.getGameQRCodes();
+                boolean enableOptions = viewer.equals(player.getUsername());
+                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
+                qrCodeList.setAdapter(qrCodeAdapter);
+            }
+        });
+    }
+
+    private interface MyCallBack {
+        void onCallBack(Context context, Player player);
+    }
+
+    private void loadUser(Context context, String username, MyCallBack myCallBack) {
         player = new Player(username);
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 player.setEmail(task.getResult().get("email").toString());
                 player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
+                player.setProfileImage(task.getResult().get("profileImage").toString());
+
+                // TODO remove
+                // Add GameQR codes to player so that there is visible content on the screen in testing
+                GameQRCode testCode1 = new GameQRCode("258f43b98430f4b5e50822bbb1070038233e286d6315ce19cb6fc0c02794eb97", 20);
+                GameQRCode testCode2 = new GameQRCode("2f0eb1859e295bcd183127558f3c205270e7a8004ad362e5123bd5b2774e0f9c", 50);
+                GameQRCode testCode3 = new GameQRCode("11", 10);
+
+                player.addGameQRCode(testCode1, null);
+                player.addGameQRCode(testCode2, null);
+                player.addGameQRCode(testCode3, null);
+                // TODO remove ^
+
+                myCallBack.onCallBack(context, player);
             }
         });
-        Bitmap defaultPic = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_profile_pic);
-        player.setProfilePic(defaultPic);
-
-        // TODO remove
-        // Add GameQR codes to player so that there is visible content on the screen in testing
-        GameQRCode testCode1 = new GameQRCode("258f43b98430f4b5e50822bbb1070038233e286d6315ce19cb6fc0c02794eb97", 20);
-        GameQRCode testCode2 = new GameQRCode("2f0eb1859e295bcd183127558f3c205270e7a8004ad362e5123bd5b2774e0f9c", 50);
-        GameQRCode testCode3 = new GameQRCode("11", 10);
-
-        player.addGameQRCode(testCode1, null);
-        player.addGameQRCode(testCode2, null);
-        player.addGameQRCode(testCode3, null);
-        // TODO remove ^
-
-        // initialize player username and image
-        ImageView profileImage = findViewById(R.id.collection_player_image);
-        profileImage.setImageBitmap(player.getProfilePic());
-
-        TextView usernameView = findViewById(R.id.collection_username);
-        usernameView.setText(player.getUsername());
-
-        // initialize player statistics
-        setPlayerStats();
-
-        // initialize page with player qr codes
-        qrCodeList = findViewById(R.id.qr_code_list);
-        qrCodeDataList = player.getGameQRCodes();
-        boolean enableOptions = viewer.equals(player.getUsername());
-        qrCodeAdapter = new GameQRCodeAdapter(this, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
-        qrCodeList.setAdapter(qrCodeAdapter);
     }
 
     /**
