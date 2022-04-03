@@ -33,6 +33,7 @@ public class SaveImageActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     ActivityResultLauncher<Intent> activityResultLauncher;
     ImageView imageView;
+    GameQRCode scannedQrCode;
 
 
     @Override
@@ -48,6 +49,7 @@ public class SaveImageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String username1 = intent.getStringExtra("username");
         String qrCodeHash = intent.getStringExtra("QRHash");
+
 
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("gameQRcodeImages/"+username1);
@@ -85,9 +87,9 @@ public class SaveImageActivity extends AppCompatActivity {
         SaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), MainActivity.class);
+                Intent intent = new Intent(SaveImageActivity.this, MainActivity.class);
                 startActivity(intent);
-
+                finish();
             }
         });
         }

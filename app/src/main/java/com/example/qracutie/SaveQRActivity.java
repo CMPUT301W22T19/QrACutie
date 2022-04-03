@@ -108,18 +108,7 @@ public class SaveQRActivity extends AppCompatActivity {
 
         // uses built-in camera to save image
         Button captureQR = (Button) findViewById(R.id.CapturePic);
-//        activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-//            @Override
-//            public void onActivityResult(ActivityResult result) {
-//                     if(result.getResultCode()== RESULT_OK && result.getData() != null){
-//                         Log.d("entered", "onActivityResult: ");
-//                         Bundle bundle = result.getData().getExtras();
-//                         Bitmap bitmap = (Bitmap) bundle.get("data");
-//                         imageView.setImageBitmap(bitmap);
-//                         uploadQRImage(bitmap);
-//                     }
-//            }
-//        });
+
         captureQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,20 +118,6 @@ public class SaveQRActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        captureQR.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//
-//                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                if (intent1.resolveActivity(getPackageManager()) != null) {
-//                    activityResultLauncher.launch(intent1);
-//
-//                } else {
-//                    Toast.makeText(SaveQRActivity.this, "Error capturing image", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
 
         Button done = findViewById(R.id.done_button);
         done.setOnClickListener(view -> {
@@ -157,23 +132,7 @@ public class SaveQRActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Begins the process of uploading the player's profile image to firebase storage
-     */
-//    private void uploadQRImage(Bitmap bitmap){
-//        // From: Youtube
-//        // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
-//        // Author: yoursTruly
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//
-//        storageReference.child(username).child(scannedQrCode.getHash()).putBytes(stream.toByteArray()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//            @Override
-//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                Toast.makeText(getApplicationContext(),"Image Uploaded",Toast.LENGTH_SHORT);
-//            }
-//        });
-//    }
+
 
 
 
