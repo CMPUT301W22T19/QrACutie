@@ -22,6 +22,7 @@ public class Player {
     int highestQRCode = 0; // highest pointed QR code belonging to the player
     int lowestQRCode = Integer.MAX_VALUE; // lowest pointed QR code belonging to the Player
     int pointTotal = 0; // the sum of all QR code points belonging to the Player
+    int totalCodes = 0; // the count of all GameQRCodes collected by the player
 
     HashMap<String, Bitmap> gameQRCodeImages = new HashMap<>(); // all images belonging to the player, mapped to GameQRCode hashes
 
@@ -139,6 +140,9 @@ public class Player {
         // update minimum and maximum found qr codes
         highestQRCode = Math.max(highestQRCode, points);
         lowestQRCode = Math.min(lowestQRCode, points);
+
+        // update total codes
+        totalCodes += 1;
     }
 
     /**
@@ -169,6 +173,9 @@ public class Player {
                 lowestQRCode = Math.min(lowestQRCode, code.getPoints());
             }
         }
+
+        // update total codes
+        totalCodes -= 1;
     }
 
     /**
@@ -225,6 +232,6 @@ public class Player {
      * @return count of GameQRCodes
      */
     public int getTotalCodes () {
-        return gameQRCodes.size();
+        return totalCodes;
     }
 }

@@ -47,7 +47,7 @@ public class MapsActivityTest {
 
         // click the back button
         assertTrue(solo.waitForText("Back", 1, 2000));
-        Button button = (Button) solo.getView(R.id.back);
+        Button button = (Button) solo.getView(R.id.maps_back);
         solo.clickOnView(button);
 
         // Asserts that the current activity switched to MainActivity. Otherwise, show “Wrong Activity”
