@@ -76,15 +76,12 @@ public class SaveQRActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_qr);
 
-
         Intent intent = getIntent();
         String username1 = intent.getStringExtra("username");
-
 
         imageView = findViewById(R.id.QRView);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT, "");
-
 
         String qrCodeString = intent.getStringExtra("qrcode");
         String qrCodeHash = shaHash(qrCodeString);
@@ -132,9 +129,22 @@ public class SaveQRActivity extends AppCompatActivity {
         });
     }
 
-
-
-
+    /**
+     * This function uses the latitude and longitude from 2 locations to determine their distance
+     * and returns that distance as a double
+     *
+     * The following function was obtained from the answer of this stackoverflow question
+     * https://stackoverflow.com/questions/49839437/how-to-show-markers-only-inside-of-radius-circle-on-maps
+     * @param LAT1 Location 1 Latitude
+     * @param LONG1 Location 1 Longitude
+     * @param LAT2 Location 2 Latitude
+     * @param LONG2 Location 2 Longitude
+     * @return
+     */
+    public double getDistance(double LAT1, double LONG1, double LAT2, double LONG2) {
+        double distance = 2 * 6371000 * Math.asin(Math.sqrt(Math.pow((Math.sin((LAT2 * (3.14159 / 180) - LAT1 * (3.14159 / 180)) / 2)), 2) + Math.cos(LAT2 * (3.14159 / 180)) * Math.cos(LAT1 * (3.14159 / 180)) * Math.sin(Math.pow(((LONG2 * (3.14159 / 180) - LONG1 * (3.14159 / 180)) / 2), 2))));
+        return distance;
+    }
 
     private void isUniqueCheck(){
         db.collection("GameQRCodes").document(scannedQrCode.getHash()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -144,6 +154,10 @@ public class SaveQRActivity extends AppCompatActivity {
                     // this is a duplicated username
                     scannedQrCode = task.getResult().toObject(GameQRCode.class);
                     scannedQrCode.incrementAmountOfScans();
+                    if(boxChecked && getDistance(scannedQrCode.getLatitude(), scannedQrCode.getLongitude(), scannedLatitude, scannedLongitude) >= 5.0) {
+                        scannedQrCode.setLongitude(scannedLongitude);
+                        scannedQrCode.setLatitude(scannedLatitude);
+                    }
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
                 }else{
                     // create the user
@@ -232,7 +246,7 @@ public class SaveQRActivity extends AppCompatActivity {
         return -1;
     }
 
-    static int computeHashScore(String hash) {
+    private static int computeHashScore(String hash) {
         int points = 0;
         int indexIncrement = 0;
         char currChar;
