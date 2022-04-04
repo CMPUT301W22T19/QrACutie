@@ -216,6 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     GameQRCode modifiedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.put(modifiedQRCode.getHash(), modifiedQRCode);
                                     MarkerOptions modifiedMarker = markerOptionsOnMap.remove(modifiedQRCode.getHash());
+                                    markersOnMap.remove(modifiedQRCode.getHash());
                                     modifiedMarker.visible(false);
                                     addBarcodeMarker(modifiedQRCode);
                                     break;
