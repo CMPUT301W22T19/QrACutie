@@ -215,17 +215,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Modified city: " + dc.getDocument().getData());
                                     GameQRCode modifiedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.put(modifiedQRCode.getHash(), modifiedQRCode);
-                                    MarkerOptions modifiedMarker = markerOptionsOnMap.remove(modifiedQRCode.getHash());
-                                    markersOnMap.remove(modifiedQRCode.getHash());
-                                    modifiedMarker.visible(false);
+                                    if(markersOnMap.containsKey(modifiedQRCode.getHash())){
+                                        MarkerOptions modifiedMarker = markerOptionsOnMap.remove(modifiedQRCode.getHash());
+                                        markersOnMap.remove(modifiedQRCode.getHash()).remove();
+                                        modifiedMarker.visible(false);
+                                    }
                                     addBarcodeMarker(modifiedQRCode);
                                     break;
                                 case REMOVED:
                                     Log.d(TAG, "Removed city: " + dc.getDocument().getData());
                                     GameQRCode removedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.remove(removedQRCode.getHash());
-                                    MarkerOptions removedMarker = markerOptionsOnMap.remove(removedQRCode.getHash());
-                                    removedMarker.visible(false);
+                                    if(markersOnMap.containsKey(removedQRCode.getHash())){
+                                        MarkerOptions removedMarker = markerOptionsOnMap.remove(removedQRCode.getHash());
+                                        markersOnMap.remove(removedQRCode.getHash()).remove();
+                                        removedMarker.visible(false);
+                                    }
                                     break;
                             }
                         }
@@ -297,6 +302,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void addBarcodeMarker(GameQRCode qrCode) {
+        if(qrCode.getLatitude() == 0 && qrCode.getLongitude() == 0) {
+            return;
+        }
         LatLng qrLocation = new LatLng(qrCode.getLatitude(), qrCode.getLongitude());
         MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCode.getPoints());
         double distance = getDistance(marker.getPosition().latitude, marker.getPosition().longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
