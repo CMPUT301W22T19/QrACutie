@@ -37,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,10 +60,12 @@ public class SaveQRActivity extends AppCompatActivity {
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String TEXT = "username";
     private String username = "";
+    private String username1;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
     GameQRCode scannedQrCode;
+    Player player;
     double scannedLatitude;
     double scannedLongitude;
     Boolean boxChecked = false;
@@ -77,7 +80,9 @@ public class SaveQRActivity extends AppCompatActivity {
         setContentView(R.layout.activity_save_qr);
 
         Intent intent = getIntent();
-        String username1 = intent.getStringExtra("username");
+        username1 = intent.getStringExtra("username");
+        String playerObject = intent.getStringExtra("player");
+        player =  new Gson().fromJson(playerObject, Player.class);
 
         imageView = findViewById(R.id.QRView);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
@@ -112,6 +117,7 @@ public class SaveQRActivity extends AppCompatActivity {
                 Intent intent = new Intent(view.getContext(), SaveImageActivity.class);
                 intent.putExtra("QRHash",scannedQrCode.getHash());
                 intent.putExtra("username",username1);
+                intent.putExtra("player", (new Gson()).toJson(player));
                 startActivity(intent);
             }
         });
@@ -125,8 +131,20 @@ public class SaveQRActivity extends AppCompatActivity {
             }
             isUniqueCheck();
             Intent intentMain = new Intent(this, MainActivity.class);
+            intentMain.putExtra("activity", "SaveQRActivity");
+            intentMain.putExtra("player", (new Gson()).toJson(player));
             startActivity(intentMain);
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent = getIntent();
+        String activity = intent.getStringExtra("activity");
+        if(activity != null && activity.equals("SaveImageActivity")) {
+            Toast.makeText(getApplicationContext(), activity, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -159,13 +177,31 @@ public class SaveQRActivity extends AppCompatActivity {
                         scannedQrCode.setLatitude(scannedLatitude);
                     }
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                    player.addGameQRCode(scannedQrCode);
+
                 }else{
-                    // create the user
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                    player.addGameQRCode(scannedQrCode);
+
                 }
             }
         });
     }
+//
+//    private Boolean isAlreadyScannedCheck(){
+//        db.collection("users").document(username1).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if(task.getResult().exists()){
+//                    // this is a duplicated username
+//                    player = task.getResult().toObject(Player.class);
+//                    if(player.checkIfGameQRCodeScanned(scannedQrCode.getHash()));{
+//                        db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+//                    }
+//                }
+//            }
+//        });
+//    }
 
     /**
      * after user checks the enable location box, the method tests to see if user has enabled

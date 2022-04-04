@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The player collection activity display's a players statistics and
@@ -116,18 +117,8 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                 player.setEmail(task.getResult().get("email").toString());
                 player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
                 player.setProfileImage(task.getResult().get("profileImage").toString());
-
-                // TODO remove
-                // Add GameQR codes to player so that there is visible content on the screen in testing
-                GameQRCode testCode1 = new GameQRCode("258f43b98430f4b5e50822bbb1070038233e286d6315ce19cb6fc0c02794eb97", 20);
-                GameQRCode testCode2 = new GameQRCode("2f0eb1859e295bcd183127558f3c205270e7a8004ad362e5123bd5b2774e0f9c", 50);
-                GameQRCode testCode3 = new GameQRCode("11", 10);
-
-                player.addGameQRCode(testCode1, null);
-                player.addGameQRCode(testCode2, null);
-                player.addGameQRCode(testCode3, null);
-                // TODO remove ^
-
+                player.setGameQRCodeImages((HashMap<String, String>) task.getResult().get("gameQRCodeImages"));
+                player.setGameQRCodes((ArrayList<GameQRCode>) task.getResult().get("gameQRCode"));
                 myCallBack.onCallBack(context, player);
             }
         });
