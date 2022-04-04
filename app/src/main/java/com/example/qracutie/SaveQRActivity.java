@@ -60,10 +60,6 @@ public class SaveQRActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("gameQRCodeImages");
-    private static final String SHARED_PREFS = "sharedPrefs";
-    private static final String TEXT = "username";
-    private String username = "";
-    private String username1;
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;
     LocationManager locationManager;
@@ -139,13 +135,15 @@ public class SaveQRActivity extends AppCompatActivity {
                 scannedQrCode.setLatitude(scannedLatitude);
                 scannedQrCode.setLongitude(scannedLongitude);
             }
-            isUniqueCheck();
-            if(capturedImage != null) uploadQRImage();
-            Intent intentMain = new Intent(this, MainActivity.class);
-            intentMain.putExtra("activity", "SaveQRActivity");
-            intentMain.putExtra("player", (new Gson()).toJson(player));
-            startActivity(intentMain);
+            isUniqueCheck(); // saves qrcode to db
         });
+    }
+
+    private void goToMain() {
+        Intent intentMain = new Intent(this, MainActivity.class);
+        intentMain.putExtra("activity", "SaveQRActivity");
+        intentMain.putExtra("player", (new Gson()).toJson(player));
+        startActivity(intentMain);
     }
 
     /**
@@ -165,6 +163,15 @@ public class SaveQRActivity extends AppCompatActivity {
         return distance;
     }
 
+    private void beginImageUpload(){
+        if(capturedImage != null) {
+            uploadQRImage(); // save images to db
+        }
+        else{
+            goToMain();
+        }
+    }
+
     private void isUniqueCheck(){
         db.collection("GameQRCodes").document(scannedQrCode.getHash()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -181,13 +188,14 @@ public class SaveQRActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
                     Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
+                    beginImageUpload();
 
                 }else{
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
                     Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
                     Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
-
+                    beginImageUpload();
                 }
             }
         });
@@ -233,6 +241,7 @@ public class SaveQRActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 player.addImage(scannedQrCode.getHash(), uri.toString());
                 Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
+                goToMain();
             }
         });
     }

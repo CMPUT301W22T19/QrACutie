@@ -262,8 +262,9 @@ public class MainActivity extends AppCompatActivity {
             playerExistence();
         }
         if (prevActivity != null && prevActivity.equals("SaveQRActivity")){
-            String playerObject = intent.getStringExtra("Player");
+            String playerObject = intent.getStringExtra("player");
             player = new Gson().fromJson(playerObject, Player.class);
+            Toast.makeText(getApplicationContext(), "IN MAIN: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
         }
     }
 
