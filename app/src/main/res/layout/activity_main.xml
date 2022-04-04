@@ -15,7 +15,8 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_gravity="center"
         android:layout_marginLeft="30dp"
         android:orientation="vertical">
@@ -103,6 +104,56 @@
             android:layout_marginBottom="10dp"
             android:background="@drawable/ic_baseline_photo_camera_24" />
 
+        <ListView
+            android:id="@+id/leaderboard"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="61dp" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/leaderboard_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="260dp"
+            app:tabGravity="fill"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/total_score_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Score" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/total_codes_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Codes" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/highest_score_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Highest Score" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <TextView
+            android:id="@+id/player_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="146dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/_0" />
+
         <ImageButton
             android:id="@+id/mapButton"
             android:layout_width="42dp"
@@ -111,6 +162,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="20dp"
             android:background="@android:drawable/ic_dialog_map" />
+
 
     </RelativeLayout>
 

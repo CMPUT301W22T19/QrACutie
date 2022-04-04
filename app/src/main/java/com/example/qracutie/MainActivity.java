@@ -22,7 +22,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.Button;
 import android.os.Environment;
@@ -38,8 +40,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -48,7 +54,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -77,11 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
     private Player player;
     private String username = "";
+
+    private ListView playerList;
+    private PlayerListAdapter playerListAdapter;
+    private ArrayList<Player> playerDataList = new ArrayList<>();
+
     private String orig_email = "";
     private String orig_phonenumber = "";
     private String orig_profile_image = "";
-
-    private ArrayList<Player> playerList = new ArrayList<>();
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -187,6 +198,48 @@ public class MainActivity extends AppCompatActivity {
             view.getContext().startActivity(intent);});
 
         playerExistence();
+
+        // create leaderboard array adapter
+        playerList = findViewById(R.id.leaderboard);
+        playerDataList = new ArrayList<>();
+        playerListAdapter = new PlayerListAdapter(this, playerDataList);
+        playerList.setAdapter(playerListAdapter);
+
+        // create leaderboard sorting buttons
+        TabLayout leaderboardTabs = findViewById(R.id.leaderboard_tabs);
+        leaderboardTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch(tab.getPosition()) {
+                    case 0:
+                        updateRank("pointTotal");
+                        updateLeaders("pointTotal", 10);
+                        break;
+                    case 1:
+                        updateRank("totalCodes");
+                        updateLeaders("totalCodes", 10);
+                        break;
+                    case 2:
+                        updateRank("highestQRCode");
+                        updateLeaders("highestQRCode", 10);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+
+        // set the user's rank
+        updateRank("pointTotal");
+
+        // set the leaderboard
+        updateLeaders("pointTotal", 10); // replaces empty leader board
     }
 
     private void playerExistence(){
@@ -242,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
      * details of a specific player profile, including player statistics and a list of all
      * QR Codes which have been collected
      */
-    private void openPlayerCollectionActivity(Player playerToView) {
+    public void openPlayerCollectionActivity(Player playerToView) {
 
         Intent intent = new Intent(this, PlayerCollectionActivity.class);
         intent.putExtra(EXTRA_PLAYER_USERNAME, this.player.getUsername());
@@ -402,6 +455,116 @@ public class MainActivity extends AppCompatActivity {
                     Glide.with(getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(profile);
                 }else{
                     generateUniqueUsername();
+                }
+            }
+        });
+    }
+
+    /**
+     * Retrieves a set amount of users at the top of some type of leaderboard
+     */
+    private void updateLeaders(String type, int limit){
+
+        // clear player collection
+        playerDataList.clear();
+
+        // update leaderboard type
+        playerListAdapter.setDisplay(type);
+
+        // update leaderboard values
+        db.collection("users")
+                .orderBy(type, Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        int rank = 1;
+                        String rankText = "#";
+
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            // load player from database
+                            Player newLeader = new Player(doc.get("username").toString());
+                            newLeader.pointTotal = doc.getLong("pointTotal").intValue();
+                            newLeader.totalCodes = doc.getLong("totalCodes").intValue();
+                            newLeader.highestQRCode = doc.getLong("highestQRCode").intValue();
+                            if (!doc.getString("profileImage").toString().equals("")) {
+                                newLeader.profileImage = doc.getString("profileImage").toString();
+                            } else {
+                                newLeader.profileImage = "";
+                            }
+
+                            // add player to data list
+                            playerDataList.add(newLeader);
+
+                            // update user rank
+                            if (newLeader.getUsername().equals(username)) {
+                                rankText += String.valueOf(rank);
+                            }
+                            // increment rank
+                            rank++;
+
+                        }
+                        // update leaderboard
+                        playerListAdapter.notifyDataSetChanged();
+
+                        // if user rank was not updated, get an estimate for user rank
+                        if (!rankText.equals("#")) {
+                            // display user rank
+                            TextView playerRank = findViewById(R.id.player_rank);
+                            playerRank.setText(rankText);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Retrieves a rank for the user based on firebase ranking map. Updates firebase rankings
+     * if no update has occurred within the past hour
+     */
+    private void updateRank(String type) {
+        // check when time of last update was
+        db.collection("rankings").document(type).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //HashMap<String, Integer> rankings = (HashMap<String, Integer>) task.getResult().get("ranks");
+                int lastUpdate = task.getResult().getLong("lastUpdate").intValue();
+                int currentTime = (int) (System.currentTimeMillis() / 1000);
+
+                // if last update is less than an hour before the current time,
+                // set the user rank. Otherwise, update all user rankings
+                if (currentTime - lastUpdate < 3600 && task.getResult().get(username) != null) {
+                    // set rankings value
+                    TextView playerRank = findViewById(R.id.player_rank);
+                    String rankText = "#" + task.getResult().get(username);
+                    playerRank.setText(rankText);
+                } else {
+                    db.collection("users")
+                            .orderBy(type, Query.Direction.DESCENDING)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> qstask) {
+
+                                    // build rankings hashmap
+                                    int rank = 1;
+                                    HashMap<String, Integer> map = new HashMap<>();
+                                    map.put("lastUpdate", currentTime);
+
+                                    for (DocumentSnapshot doc : qstask.getResult()) {
+                                        map.put(doc.get("username").toString(), rank++);
+                                    }
+
+                                    // save hashmap to database
+                                    db.collection("rankings").document(type).set(map);
+
+                                    // display user rank
+                                    TextView playerRank = findViewById(R.id.player_rank);
+                                    String rankText = "#" + map.get(username);
+                                    playerRank.setText(rankText);
+                                }
+                            });
                 }
             }
         });
