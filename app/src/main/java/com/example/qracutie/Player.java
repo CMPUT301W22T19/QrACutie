@@ -35,6 +35,10 @@ public class Player {
     }
 
     /**
+     * No argument constructor for db
+     */
+    public Player() {}
+    /**
      * returns username associated with Player
      * @return username
      */

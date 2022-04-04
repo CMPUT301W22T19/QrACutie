@@ -141,8 +141,6 @@ public class SaveQRActivity extends AppCompatActivity {
 
     private void goToMain() {
         Intent intentMain = new Intent(this, MainActivity.class);
-        intentMain.putExtra("activity", "SaveQRActivity");
-        intentMain.putExtra("player", (new Gson()).toJson(player));
         startActivity(intentMain);
     }
 
@@ -168,8 +166,19 @@ public class SaveQRActivity extends AppCompatActivity {
             uploadQRImage(); // save images to db
         }
         else{
-            goToMain();
+            updatePlayer();
         }
+    }
+
+    private void updatePlayer(){
+        db.collection("users").document(player.getUsername()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                db.collection("users").document(player.getUsername()).set(player);
+                Toast.makeText(getApplicationContext(), "SAVING: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
+            }
+        });
+        goToMain();
     }
 
     private void isUniqueCheck(){
@@ -241,7 +250,7 @@ public class SaveQRActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 player.addImage(scannedQrCode.getHash(), uri.toString());
                 Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
-                goToMain();
+                updatePlayer();
             }
         });
     }

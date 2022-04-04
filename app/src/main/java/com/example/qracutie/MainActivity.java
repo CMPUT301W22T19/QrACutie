@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Player player;
     private String username = "";
+    private Boolean isPlayerSet = false;
 
     private ListView playerList;
     private PlayerListAdapter playerListAdapter;
@@ -189,13 +190,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        cameraButton = (Button) findViewById(R.id.cameraButton);
-        cameraButton.setOnClickListener(view -> {
-            Intent intent = new Intent(view.getContext(), CameraActivity.class);
-            intent.putExtra("player", (new Gson()).toJson(player));
-            view.getContext().startActivity(intent);});
 
         playerExistence();
+
+        cameraButton = (Button) findViewById(R.id.cameraButton);
+        cameraButton.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), CameraActivity.class);
+                //intent.putExtra("player", (new Gson()).toJson(player));
+                intent.putExtra("username", username);
+                view.getContext().startActivity(intent);
+        });
 
         // create leaderboard array adapter
         playerList = findViewById(R.id.leaderboard);
@@ -264,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         if (prevActivity != null && prevActivity.equals("SaveQRActivity")){
             String playerObject = intent.getStringExtra("player");
             player = new Gson().fromJson(playerObject, Player.class);
-            Toast.makeText(getApplicationContext(), "IN MAIN: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
+            username = player.getUsername();
         }
     }
 
@@ -415,20 +419,21 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(TEXT, username);
         editor.apply();
-        savePlayerInfo();
+        //savePlayerInfo();
     }
 
-    /**
-     * Saves player attributes
-     */
-    private void savePlayerInfo(){
-        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                db.collection("users").document(username).set(player);
-            }
-        });
-    }
+//    /**
+//     * Saves player attributes
+//     */
+//    private void savePlayerInfo(){
+//        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                db.collection("users").document(username).set(player);
+//                Toast.makeText(getApplicationContext(), "SAVING: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
     /**
      * Retrieves the info of an existing player from the database
@@ -443,7 +448,10 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> orig_gameQRCodeImages = (HashMap<String, String>) task.getResult().get("gameQRCodeImages");
                     player.setGameQRCodes(orig_gameQrCodes);
                     player.setGameQRCodeImages(orig_gameQRCodeImages);
-                    nameDisplayed.setText(username);
+                    player.highestQRCode = (int) (long) task.getResult().get("highestQRCode");
+                    player.lowestQRCode = (int) (long) task.getResult().get("lowestQRCode");
+                    player.pointTotal = (int) (long) task.getResult().get("pointTotal");
+                    player.totalCodes = (int) (long) task.getResult().get("totalCodes");
                     String orig_profile_image = task.getResult().get("profileImage").toString();
                     String orig_email = task.getResult().get("email").toString();
                     String orig_phonenumber = task.getResult().get("phoneNumber").toString();
@@ -451,8 +459,11 @@ public class MainActivity extends AppCompatActivity {
                     player.setPhoneNumber(orig_phonenumber);
                     player.setProfileImage(orig_profile_image);
                     Glide.with(getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(profile);
+                    nameDisplayed.setText(username);
+                    isPlayerSet = true;
                 }else{
                     generateUniqueUsername();
+                    isPlayerSet = true;
                 }
             }
         });
