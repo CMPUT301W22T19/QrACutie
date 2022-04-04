@@ -55,7 +55,6 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
         String playerObject = intent.getStringExtra("player");
         player =  new Gson().fromJson(playerObject, Player.class);
         setContentView(R.layout.activity_camera);
@@ -73,7 +72,6 @@ public class CameraActivity extends AppCompatActivity {
 
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
-                intent.putExtra("username",username);
                 intent.putExtra("player", (new Gson()).toJson(player));
                 intent.putExtra("qrcode", qrCode);
                 String hash = shaHash(qrCode);

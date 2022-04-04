@@ -192,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
         cameraButton = (Button) findViewById(R.id.cameraButton);
         cameraButton.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), CameraActivity.class);
-            intent.putExtra("username", username);
             intent.putExtra("player", (new Gson()).toJson(player));
             view.getContext().startActivity(intent);});
 
@@ -259,10 +258,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Intent intent = getIntent();
         String prevActivity = intent.getStringExtra("activity");
-        if (prevActivity != null && prevActivity.toString().equals("ownerspage")) {
+        if (prevActivity != null && prevActivity.equals("ownerspage")) {
             playerExistence();
         }
-        if (prevActivity != null && prevActivity.toString().equals("SaveQRActivity")){
+        if (prevActivity != null && prevActivity.equals("SaveQRActivity")){
             String playerObject = intent.getStringExtra("Player");
             player = new Gson().fromJson(playerObject, Player.class);
         }

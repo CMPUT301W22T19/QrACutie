@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,11 +31,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
@@ -70,8 +73,10 @@ public class SaveQRActivity extends AppCompatActivity {
     double scannedLongitude;
     Boolean boxChecked = false;
     ImageView imageView;
-    String currentPhotoPath;
-
+    Bitmap capturedImage;
+    String qrCodeString;
+    StorageReference storageRef;
+    StorageReference imageQRRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,18 +85,24 @@ public class SaveQRActivity extends AppCompatActivity {
         setContentView(R.layout.activity_save_qr);
 
         Intent intent = getIntent();
-        username1 = intent.getStringExtra("username");
+        String activity = intent.getStringExtra("activity");
         String playerObject = intent.getStringExtra("player");
         player =  new Gson().fromJson(playerObject, Player.class);
-
-        imageView = findViewById(R.id.QRView);
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        username = sharedPreferences.getString(TEXT, "");
-
-        String qrCodeString = intent.getStringExtra("qrcode");
+        qrCodeString = intent.getStringExtra("qrcode");
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
         scannedQrCode = new GameQRCode(qrCodeHash, points);
+        if(activity != null && activity.equals("SaveImageActivity")) {
+            imageView = findViewById(R.id.save_image_view);
+            String imageObject = intent.getStringExtra("player");
+            capturedImage = (Bitmap) intent.getParcelableExtra("image");
+            imageView.setImageBitmap(capturedImage);
+            Toast.makeText(getApplicationContext(), activity, Toast.LENGTH_SHORT).show();
+            storageRef = FirebaseStorage.getInstance().getReference("gameQRcodeImages/"+player.getUsername());
+            imageQRRef = storageRef.child(qrCodeHash);
+        }
+
+        Toast.makeText(getApplicationContext(), player.getUsername(), Toast.LENGTH_SHORT).show();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         // This part asks for location access permission from the user
@@ -115,9 +126,8 @@ public class SaveQRActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), SaveImageActivity.class);
-                intent.putExtra("QRHash",scannedQrCode.getHash());
-                intent.putExtra("username",username1);
                 intent.putExtra("player", (new Gson()).toJson(player));
+                intent.putExtra("qrcode", qrCodeString);
                 startActivity(intent);
             }
         });
@@ -130,21 +140,12 @@ public class SaveQRActivity extends AppCompatActivity {
                 scannedQrCode.setLongitude(scannedLongitude);
             }
             isUniqueCheck();
+            if(capturedImage != null) uploadQRImage();
             Intent intentMain = new Intent(this, MainActivity.class);
             intentMain.putExtra("activity", "SaveQRActivity");
             intentMain.putExtra("player", (new Gson()).toJson(player));
             startActivity(intentMain);
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Intent intent = getIntent();
-        String activity = intent.getStringExtra("activity");
-        if(activity != null && activity.equals("SaveImageActivity")) {
-            Toast.makeText(getApplicationContext(), activity, Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**
@@ -177,31 +178,64 @@ public class SaveQRActivity extends AppCompatActivity {
                         scannedQrCode.setLatitude(scannedLatitude);
                     }
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                    Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
+                    Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
 
                 }else{
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
+                    Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
+                    Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
 
                 }
             }
         });
     }
-//
-//    private Boolean isAlreadyScannedCheck(){
-//        db.collection("users").document(username1).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if(task.getResult().exists()){
-//                    // this is a duplicated username
-//                    player = task.getResult().toObject(Player.class);
-//                    if(player.checkIfGameQRCodeScanned(scannedQrCode.getHash()));{
-//                        db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
-//                    }
-//                }
-//            }
-//        });
-//    }
+
+    /**
+     * Begins the process of uploading the player's profile image to firebase storage
+     * From: Firebase Documentation
+     * Link: https://firebase.google.com/docs/storage/android/start
+     */
+    private void uploadQRImage(){
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        capturedImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("image/jpg")
+                .build();
+        UploadTask uploadTask = imageQRRef.putBytes(data, metadata);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                // ...
+                Toast.makeText(getApplicationContext(), "SavedTODB", Toast.LENGTH_SHORT).show();
+                addImageUri();
+            }
+        });
+    }
+
+    /**
+     * Adds image to player object
+     */
+    private void addImageUri(){
+        imageQRRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
+                player.addImage(scannedQrCode.getHash(), uri.toString());
+                Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     /**
      * after user checks the enable location box, the method tests to see if user has enabled
@@ -254,7 +288,7 @@ public class SaveQRActivity extends AppCompatActivity {
      * @return QR code hash
      */
     // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
-    public static String shaHash(final String base) {
+    public String shaHash(final String base) {
         try{
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");
             final byte[] hash = digest.digest(base.getBytes("UTF-8"));
@@ -271,7 +305,7 @@ public class SaveQRActivity extends AppCompatActivity {
         }
     }
 
-    private static int charToInt(char ch)
+    private int charToInt(char ch)
     {
         if (ch >= '0' && ch <= '9')
             return ch - '0';
@@ -282,7 +316,7 @@ public class SaveQRActivity extends AppCompatActivity {
         return -1;
     }
 
-    private static int computeHashScore(String hash) {
+    private int computeHashScore(String hash) {
         int points = 0;
         int indexIncrement = 0;
         char currChar;
