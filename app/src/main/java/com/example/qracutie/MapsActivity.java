@@ -2,7 +2,6 @@ package com.example.qracutie;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -22,7 +21,11 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,6 +48,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,8 +72,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     Circle circle;
     HashMap<String, GameQRCode> qrCodes = new HashMap<>();
-    HashMap<String, MarkerOptions> markersOnMap = new HashMap<>();
+    HashMap<String, MarkerOptions> markerOptionsOnMap = new HashMap<>();
+    HashMap<String, Marker> markersOnMap = new HashMap<>();
     Button backButton;
+    ListView qrCodeList;
+    NearbyQRCode selectedQRCode;
+    ArrayAdapter<NearbyQRCode> nearByCodesAdapter;
+    ArrayList<NearbyQRCode> nearbyQRCodes = new ArrayList<>();
 
     @SuppressLint("MissingPermission")
     @Override
@@ -82,7 +92,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        backButton = findViewById(R.id.back);
+        qrCodeList = findViewById(R.id.nearby_qr_code_list);
+
+        qrCodeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object listItem = qrCodeList.getItemAtPosition(position);
+                if(selectedQRCode != null) {
+                    Marker selectedMarker = markersOnMap.get(selectedQRCode.getHash());
+                    selectedMarker.hideInfoWindow();
+                }
+                selectedQRCode = (NearbyQRCode) listItem;
+                Marker selectedMarker = markersOnMap.get(selectedQRCode.getHash());
+                selectedMarker.showInfoWindow();
+            }
+        });
+
+        backButton = findViewById(R.id.maps_back);
         backButton.setOnClickListener(view -> {
             Intent intentMain = new Intent(this, MainActivity.class);
             startActivity(intentMain);
@@ -104,6 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     REQUEST_LOCATION_PERMISSION);
         }
 
+        nearByCodesAdapter = new NearByCodesAdapter(this, nearbyQRCodes);
         locationListener = new LocationListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -115,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double difference = getDistance(latitude, longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
 
                 // To avoid constant flicker from redrawing markers and circle, we only want to draw if the user has moved far enough
-                if(difference > 10) {
+                if(difference > 7) {
                     mMap.clear();
                     if (playerMarker != null) {
                         playerMarker.remove();
@@ -133,6 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .center(latLng)
                             .radius(250)
                             .strokeColor(Color.BLACK));
+                    nearbyQRCodes.clear();
                     updateQRCodeMarkers();
                 }
             }
@@ -187,16 +215,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Modified city: " + dc.getDocument().getData());
                                     GameQRCode modifiedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.put(modifiedQRCode.getHash(), modifiedQRCode);
-                                    MarkerOptions modifiedMarker = markersOnMap.remove(modifiedQRCode.getHash());
-                                    modifiedMarker.visible(false);
+                                    if(markersOnMap.containsKey(modifiedQRCode.getHash())){
+                                        MarkerOptions modifiedMarker = markerOptionsOnMap.remove(modifiedQRCode.getHash());
+                                        markersOnMap.remove(modifiedQRCode.getHash()).remove();
+                                        modifiedMarker.visible(false);
+                                    }
                                     addBarcodeMarker(modifiedQRCode);
                                     break;
                                 case REMOVED:
                                     Log.d(TAG, "Removed city: " + dc.getDocument().getData());
                                     GameQRCode removedQRCode = dc.getDocument().toObject(GameQRCode.class);
                                     qrCodes.remove(removedQRCode.getHash());
-                                    MarkerOptions removedMarker = markersOnMap.remove(removedQRCode.getHash());
-                                    removedMarker.visible(false);
+                                    if(markersOnMap.containsKey(removedQRCode.getHash())){
+                                        MarkerOptions removedMarker = markerOptionsOnMap.remove(removedQRCode.getHash());
+                                        markersOnMap.remove(removedQRCode.getHash()).remove();
+                                        removedMarker.visible(false);
+                                    }
                                     break;
                             }
                         }
@@ -207,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void updateQRCodeMarkers() {
-        for(Map.Entry<String, MarkerOptions> entry : markersOnMap.entrySet()) {
+        for(Map.Entry<String, MarkerOptions> entry : markerOptionsOnMap.entrySet()) {
             MarkerOptions marker = entry.getValue();
             String hash = entry.getKey();
             double distance = getDistance(marker.getPosition().latitude, marker.getPosition().longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
@@ -216,10 +250,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             else{
                 marker.visible(true);
+                updateNearbyQRCodeList(qrCodes.get(hash), distance);
             }
-            markersOnMap.put(hash, marker);
-            mMap.addMarker(marker);
+            markerOptionsOnMap.put(hash, marker);
+            markersOnMap.put(hash, mMap.addMarker(marker));
         }
+    }
+
+    private void updateNearbyQRCodeList(GameQRCode qrCode, double distance) {
+        int barcode_icon = R.drawable.stock_barcode_icon;
+        if (qrCode.getPoints() < 100) barcode_icon = R.drawable.green_barcode_icon;
+        if (qrCode.getPoints() >= 100 && qrCode.getPoints() < 500) barcode_icon = R.drawable.yellow_barcode_icon;
+        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1000) barcode_icon = R.drawable.orange_barcode_icon;
+        if (qrCode.getPoints() >= 1000 && qrCode.getPoints() < 5000) barcode_icon = R.drawable.red_barcode_icon;
+        if (qrCode.getPoints() >= 5000 && qrCode.getPoints() < 7500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() >= 7500) barcode_icon = R.drawable.blue_barcode_icon;
+
+        BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(barcode_icon);
+        Bitmap b = bitmapdraw.getBitmap();
+        nearbyQRCodes.add(new NearbyQRCode(qrCode.getPoints(), qrCode.getHash(), Double.toString(distance), b));
+        Collections.sort(nearbyQRCodes, new Comparator<NearbyQRCode>() {
+
+            /* This comparator will sort objects alphabetically. */
+
+            @Override
+            public int compare(NearbyQRCode q1, NearbyQRCode q2) {
+
+                double d1 = Double.valueOf(q1.getDistance());
+                double d2 = Double.valueOf(q2.getDistance());
+                return Double.compare(d1, d2);
+            }
+        });
+        nearByCodesAdapter = new NearByCodesAdapter(this, nearbyQRCodes);
+        qrCodeList.setAdapter(nearByCodesAdapter);
     }
 
     /**
@@ -239,25 +302,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return distance;
     }
 
-    private void addBarcodeMarker(GameQRCode qrCodes) {
-        LatLng qrLocation = new LatLng(qrCodes.getLatitude(), qrCodes.getLongitude());
-        MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCodes.getPoints());
+    private void addBarcodeMarker(GameQRCode qrCode) {
+        if(qrCode.getLatitude() == 0 && qrCode.getLongitude() == 0) return;
+
+        LatLng qrLocation = new LatLng(qrCode.getLatitude(), qrCode.getLongitude());
+        MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCode.getPoints());
         double distance = getDistance(marker.getPosition().latitude, marker.getPosition().longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
         if (distance > 250) {
             marker.visible(false);
         }
         else{
             marker.visible(true);
+            updateNearbyQRCodeList(qrCode, distance);
         }
         int height = 100;
         int width = 100;
         int barcode_icon = R.drawable.stock_barcode_icon;
 
-        if (qrCodes.getPoints() < 500) barcode_icon = R.drawable.green_barcode_icon;
-        if (qrCodes.getPoints() >= 500 && qrCodes.getPoints() < 1750) barcode_icon = R.drawable.yellow_barcode_icon;
-        if (qrCodes.getPoints() >= 1750 && qrCodes.getPoints() < 3000) barcode_icon = R.drawable.orange_barcode_icon;
-        if (qrCodes.getPoints() >= 3000 && qrCodes.getPoints() < 6500) barcode_icon = R.drawable.red_barcode_icon;
-        if (qrCodes.getPoints() >= 6500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() < 100) barcode_icon = R.drawable.green_barcode_icon;
+        if (qrCode.getPoints() >= 100 && qrCode.getPoints() < 500) barcode_icon = R.drawable.yellow_barcode_icon;
+        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1000) barcode_icon = R.drawable.orange_barcode_icon;
+        if (qrCode.getPoints() >= 1000 && qrCode.getPoints() < 5000) barcode_icon = R.drawable.red_barcode_icon;
+        if (qrCode.getPoints() >= 5000 && qrCode.getPoints() < 7500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() >= 7500) barcode_icon = R.drawable.blue_barcode_icon;
 
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(barcode_icon);
         Bitmap b = bitmapdraw.getBitmap();
@@ -267,8 +334,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         marker.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
 
         // adding marker
-        mMap.addMarker(marker);
-        markersOnMap.put(qrCodes.getHash(), marker);
+        markersOnMap.put(qrCode.getHash(), mMap.addMarker(marker));
+        markerOptionsOnMap.put(qrCode.getHash(), marker);
     }
 
     @SuppressLint("MissingPermission")

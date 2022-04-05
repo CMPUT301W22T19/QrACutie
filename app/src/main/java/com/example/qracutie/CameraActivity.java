@@ -1,9 +1,12 @@
 package com.example.qracutie;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
@@ -21,10 +24,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+import com.google.gson.Gson;
 
+import java.security.MessageDigest;
 import java.util.concurrent.ExecutionException;
+
 
 /**
  * Activity that calls the camera in order to scan a QR Code
@@ -38,21 +48,38 @@ import java.util.concurrent.ExecutionException;
  */
 public class CameraActivity extends AppCompatActivity {
 
-    public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String TEXT = "username";
     private static final int PERMISSION_REQUEST_CAMERA = 0;
     private PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Button qrCodeFoundButton;
     private String qrCode;
+    private Player player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("username");
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        player = document.toObject(Player.class);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
+        setContentView(R.layout.activity_camera);
         // Get a top level reference to the collection
 
         previewView = findViewById(R.id.PeekView);
@@ -62,16 +89,47 @@ public class CameraActivity extends AppCompatActivity {
         qrCodeFoundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //String hash = sha256(qrCode);
+
                 Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
+                intent.putExtra("player", (new Gson()).toJson(player));
                 intent.putExtra("qrcode", qrCode);
-                v.getContext().startActivity(intent);
+                String hash = shaHash(qrCode);
+
+                if(!player.checkIfGameQRCodeScanned(hash)) {
+                    v.getContext().startActivity(intent);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Already Scanned!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         requestCamera();
+    }
+
+    /**
+     * hashes a string representation of a QR code using the sha 256 algorithm
+     * @param base string representation of QR code
+     * @return QR code hash
+     */
+    // https://stackoverflow.com/questions/5531455/how-to-hash-some-string-with-sha256-in-java
+    public static String shaHash(final String base) {
+        try{
+            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            final byte[] hash = digest.digest(base.getBytes("UTF-8"));
+            final StringBuilder hexString = new StringBuilder();
+            for (int i = 0; i < hash.length; i++) {
+                final String hex = Integer.toHexString(0xff & hash[i]);
+                if(hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch(Exception ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     private void requestCamera() {

@@ -1,14 +1,23 @@
 package com.example.qracutie;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The account activity allows a player to chang contact information associated with
@@ -17,10 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class Account extends AppCompatActivity {
 
     public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
-    private static final String SHARED_PREFS = "sharedPrefs";
-    private static final String TEXT = "username";
-
-    private String username = "";
 
     private EditText newEmail;
     private EditText newPhonenumber;
@@ -36,14 +41,22 @@ public class Account extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        username = sharedPreferences.getString(TEXT, "");
-
         Intent intent = getIntent();
 
         newEmail = findViewById(R.id.new_email);
         newPhonenumber = findViewById(R.id.new_phonenumber);
         done = findViewById(R.id.done);
+
+        // prepopulate email and phone number fields
+        db.collection("users").document(intent.getStringExtra("username")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String oldEmail = task.getResult().get("email").toString();
+                newEmail.setText(oldEmail);
+                String oldNumber = task.getResult().get("phoneNumber").toString();
+                newPhonenumber.setText(oldNumber);
+            }
+        });
 
        done.setOnClickListener(new View.OnClickListener() {
            @Override

@@ -3,18 +3,39 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/account.xml" value="0.5" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.33" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.24895833333333334" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.24895833333333334" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/after_scanning_qr_code.xml" value="0.2" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.25" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_comments.xml" value="0.33" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.67" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_maps.xml" value="0.22" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_nearby_codes.xml" value="0.33" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.25" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_save_qr.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.26435601356710076" />
-        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.15806159420289856" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/content.xml" value="0.25" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.33" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/list_nearby_qr_code.xml" value="0.33" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.15462962962962962" />
+        <entry key="app/src/main/res/drawable/border.xml" value="0.20925925925925926" />
+        <entry key="app/src/main/res/drawable/button.xml" value="0.19073751614121612" />
+        <entry key="app/src/main/res/drawable/circle_border.xml" value="0.10282609578633074" />
+        <entry key="app/src/main/res/drawable/gradient1.xml" value="0.20925925925925926" />
+        <entry key="app/src/main/res/drawable/gradient_drawable.xml" value="0.1421875" />
+        <entry key="app/src/main/res/drawable/owner_border.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3092883921754084" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.2226529041157416" />
+        <entry key="app/src/main/res/layout/activity_owner_all_players.xml" value="0.22184264152869357" />
+        <entry key="app/src/main/res/layout/activity_owner_login.xml" value="0.2490503644063534" />
         <entry key="app/src/main/res/layout/activity_player_collection.xml" value="0.9294361889203344" />
+        <entry key="app/src/main/res/layout/activity_search_player.xml" value="0.3482373172828891" />
+        <entry key="app/src/main/res/layout/qr_recyclerview_list_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/recyclerview_list_item.xml" value="0.5067047524739491" />
+        <entry key="app/src/main/res/menu/main_menu.xml" value="0.15885416666666666" />
       </map>
     </option>
   </component>
