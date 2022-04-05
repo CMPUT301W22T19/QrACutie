@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
 
@@ -263,18 +262,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Intent intent = getIntent();
         String prevActivity = intent.getStringExtra("activity");
-        if (prevActivity != null && prevActivity.equals("ownerspage")) {
-            if(intent.getBooleanExtra("ownerDeletedSelf",false) == true){
-                clearPlayerFromStorage();
-            }
-            playerExistence();
+        if(prevActivity != null && prevActivity.equals("ownerspage") && intent.getBooleanExtra("ownerDeletedSelf",false) == true){
+            clearPlayerFromStorage();
         }
-        if (prevActivity != null && prevActivity.equals("SaveQRActivity")){
-            //String playerObject = intent.getStringExtra("player");
-            //player = new Gson().fromJson(playerObject, Player.class);
-            //username = player.getUsername();
-
-        }
+        playerExistence();
     }
 
     private void clearPlayerFromStorage() {
