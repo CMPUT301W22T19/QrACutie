@@ -32,8 +32,8 @@ public class PlayerTest {
         GameQRCode gc1 = new GameQRCode("gc1", 50);
         GameQRCode gc2 = new GameQRCode("gc2", 30);
 
-        player.addGameQRCode(gc1, null);
-        player.addGameQRCode(gc2, null);
+        player.addGameQRCode(gc1);
+        player.addGameQRCode(gc2);
 
         // ensure the player has two codes now
         assertEquals(2, player.getTotalCodes());
@@ -52,8 +52,8 @@ public class PlayerTest {
         // add two game QR codes to the player
         GameQRCode gc1 = new GameQRCode("gc1", 50);
         GameQRCode gc2 = new GameQRCode("gc2", 30);
-        player.addGameQRCode(gc1, null);
-        player.addGameQRCode(gc2, null);
+        player.addGameQRCode(gc1);
+        player.addGameQRCode(gc2);
 
         // ensure the player has 80 total points now
         assertEquals(80, player.getPointTotal());
@@ -72,8 +72,8 @@ public class PlayerTest {
         // add two game QR codes to the player
         GameQRCode gc1 = new GameQRCode("gc1", 50);
         GameQRCode gc2 = new GameQRCode("gc2", 30);
-        player.addGameQRCode(gc1, null);
-        player.addGameQRCode(gc2, null);
+        player.addGameQRCode(gc1);
+        player.addGameQRCode(gc2);
 
         // ensure the player returns 50 for the highest found qr code
         assertEquals(50, player.getHighestQRCode());
@@ -92,8 +92,8 @@ public class PlayerTest {
         // add two game QR codes to the player
         GameQRCode gc1 = new GameQRCode("gc1", 50);
         GameQRCode gc2 = new GameQRCode("gc2", 30);
-        player.addGameQRCode(gc1, null);
-        player.addGameQRCode(gc2, null);
+        player.addGameQRCode(gc1);
+        player.addGameQRCode(gc2);
 
         // ensure the player returns 30 for the lowest found qr code
         assertEquals(30, player.getLowestQRCode());

@@ -3,6 +3,7 @@ package com.example.qracutie;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,7 +27,7 @@ import java.util.HashMap;
  */
 public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
     private ArrayList<GameQRCode> qrCodes;
-    HashMap<String, Bitmap> qrCodeImages;
+    HashMap<String, String> qrCodeImages;
     private Context context;
 
     boolean showOptions;
@@ -34,7 +38,7 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
      * @param qrCodes an array list of GameQRCode objects
      * @param qrCodeImages a hashmap of QRCode identifiers and images saved as Bitmaps
      */
-    public GameQRCodeAdapter(Context context, ArrayList<GameQRCode> qrCodes, HashMap<String, Bitmap> qrCodeImages, boolean showOptions) {
+    public GameQRCodeAdapter(Context context, ArrayList<GameQRCode> qrCodes, HashMap<String, String> qrCodeImages, boolean showOptions) {
         super(context, 0, qrCodes);
         this.qrCodes = qrCodes;
         this.context = context;
@@ -63,13 +67,16 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
 
         // set qr code image
         ImageView qrCodeImage = view.findViewById(R.id.qr_code_list_image);
-        Bitmap image;
-        if (qrCodeImages.containsKey(qrCode.getHash())) {
-            image = qrCodeImages.get(qrCode.getHash());
+        String imageString;
+        Glide.with(context).clear(qrCodeImage);
+        if (!qrCodeImages.containsKey(qrCode.getHash())) {
+            Glide.with(context).asBitmap().load(Uri.parse(qrCodeImages.get(qrCode.getHash())))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(qrCodeImage);
         } else {
-            image = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_qrcode_image);
+            qrCodeImage.setImageResource(R.drawable.default_profile_pic);
         }
-        qrCodeImage.setImageBitmap(image);
 
         // set qr code points
         TextView qrCodePoints = view.findViewById(R.id.qr_code_list_points_val);

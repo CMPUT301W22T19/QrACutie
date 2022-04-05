@@ -5,6 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
+    android:background="@drawable/gradient_drawable"
     >
 
     <ImageView
@@ -12,10 +13,10 @@
         android:layout_width="336dp"
         android:layout_height="364dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="37dp" />
+        tools:layout_editor_absoluteY="86dp" />
 
     <Button
         android:id="@+id/SaveQRImage"
