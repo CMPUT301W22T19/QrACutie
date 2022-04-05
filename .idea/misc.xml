@@ -3,14 +3,25 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.33" />
         <entry key="..\:/Users/IMustQuestion/Documents/301workspace/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.24895833333333334" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.24895833333333334" />
         <entry key="..\:/Users/Owner/OneDrive/Documents/Degree n stuff/Winter 2022/Cmput 301/QrACutie/app/src/main/res/layout/after_scanning_qr_code.xml" value="0.2" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_camera.xml" value="0.25" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_comments.xml" value="0.33" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_main.xml" value="0.67" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_maps.xml" value="0.22" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_nearby_codes.xml" value="0.33" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_player_collection.xml" value="0.25" />
         <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/activity_save_qr.xml" value="0.33" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/content.xml" value="0.25" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/list_game_qr_code.xml" value="0.33" />
+        <entry key="..\:/Users/hetul/Downloads/School/CMPUT301/Project/QrACutie/app/src/main/res/layout/list_nearby_qr_code.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.26435601356710076" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.15806159420289856" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.15462962962962962" />
         <entry key="app/src/main/res/drawable/border.xml" value="0.20925925925925926" />
         <entry key="app/src/main/res/drawable/button.xml" value="0.19073751614121612" />

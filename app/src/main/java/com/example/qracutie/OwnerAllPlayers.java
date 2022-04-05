@@ -149,6 +149,7 @@ public class OwnerAllPlayers extends AppCompatActivity {
     private void sendClassInfo(){
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("activity", "ownerspage");
+        intent.putExtra("ownerDeleteSelf", adapter.getOwnerDeletedSelf());
         startActivity(intent);
     }
 }
