@@ -249,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
         username = sharedPreferences.getString(TEXT,"");
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
+        // or owner deleted their own player profile
         if (username.equals("")){
             generateUniqueUsername();
         }else{
@@ -263,13 +264,21 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String prevActivity = intent.getStringExtra("activity");
         if (prevActivity != null && prevActivity.equals("ownerspage")) {
+            if(intent.getBooleanExtra("ownerDeletedSelf",false) == true){
+                clearPlayerFromStorage();
+            }
             playerExistence();
         }
         if (prevActivity != null && prevActivity.equals("SaveQRActivity")){
-            String playerObject = intent.getStringExtra("player");
-            player = new Gson().fromJson(playerObject, Player.class);
-            username = player.getUsername();
+            //String playerObject = intent.getStringExtra("player");
+            //player = new Gson().fromJson(playerObject, Player.class);
+            //username = player.getUsername();
+
         }
+    }
+
+    private void clearPlayerFromStorage() {
+        FirebaseStorage.getInstance().getReference().child("gameQRcodeImages").child(username).delete();
     }
 
     @SuppressLint("RestrictedApi")
@@ -397,6 +406,10 @@ public class MainActivity extends AppCompatActivity {
      * Creates the player in Firebase
      */
     private void createNewUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(TEXT, username);
+        editor.apply();
         nameDisplayed.setText(username);
         player = new Player(username);
         db.collection("users").document(username).set(player);
@@ -408,32 +421,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveUser();
+        saveUserInfo("saveProfileImage");
     }
 
     /**
      * Saves player name
      */
-    protected void saveUser(){
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(TEXT, username);
-        editor.apply();
-        //savePlayerInfo();
+    protected void saveUserInfo(String called){
+        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(called.equals("account")){
+                    db.collection("users").document(username).update("email", player.getEmail());
+                    db.collection("users").document(username).update("phonenumber", player.getPhoneNumber());
+                }else{
+                    db.collection("users").document(username).update("profileImage", player.getProfileImage());
+                }
+            }
+        });
     }
-
-//    /**
-//     * Saves player attributes
-//     */
-//    private void savePlayerInfo(){
-//        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                db.collection("users").document(username).set(player);
-//                Toast.makeText(getApplicationContext(), "SAVING: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
     /**
      * Retrieves the info of an existing player from the database
@@ -462,6 +468,9 @@ public class MainActivity extends AppCompatActivity {
                     nameDisplayed.setText(username);
                     isPlayerSet = true;
                 }else{
+                    // user is in shared preferences not in the database, meaning they no longer exist
+                    // because the owner has deleted them
+                    clearPlayerFromStorage();
                     generateUniqueUsername();
                     isPlayerSet = true;
                 }
@@ -607,6 +616,9 @@ public class MainActivity extends AppCompatActivity {
             }
             if(!UPhonenumber.equals("")){
                 player.setPhoneNumber(info.getString("phonenumber"));
+            }
+            if(!UEmail.equals("") || !UPhonenumber.equals("")){
+                saveUserInfo("account");
             }
         }
     }

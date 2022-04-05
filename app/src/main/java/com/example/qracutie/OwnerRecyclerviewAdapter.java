@@ -26,6 +26,7 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
     private String username;
     private Context context;
     private Integer selected = -1;
+    private Boolean ownerDeletedSelf = false;
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("profileImages");
     private CollectionReference db = FirebaseFirestore.getInstance().collection("users");
 
@@ -59,6 +60,7 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
                 if(playerNames.get(position).equals(username)){
                     SharedPreferences sharedPreferences  = context.getApplicationContext().getSharedPreferences("sharedPrefs", Context.MODE_PRIVATE);
                     sharedPreferences.edit().clear().commit();
+                    ownerDeletedSelf = true;
                 }
                 remFromDat(position);
                 playerNames.remove(position);
@@ -69,6 +71,9 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
         });
     }
 
+    public Boolean getOwnerDeletedSelf(){
+        return ownerDeletedSelf;
+    }
     private void remFromDat(int pos){
         storageReference.child(playerNames.get(pos)+".jpeg").delete();
         db.document(playerNames.get(pos)).delete();

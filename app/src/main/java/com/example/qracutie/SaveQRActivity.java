@@ -211,6 +211,21 @@ public class SaveQRActivity extends AppCompatActivity {
     }
 
     /**
+     * Adds image to player object
+     */
+    private void theImageUri(){
+        imageQRRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
+                player.addImage(scannedQrCode.getHash(), uri.toString());
+                Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
+                updatePlayer();
+            }
+        });
+    }
+
+    /**
      * Begins the process of uploading the player's profile image to firebase storage
      * From: Firebase Documentation
      * Link: https://firebase.google.com/docs/storage/android/start
