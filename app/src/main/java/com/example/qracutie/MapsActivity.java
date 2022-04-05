@@ -303,7 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void addBarcodeMarker(GameQRCode qrCode) {
-        if(qrCode.getLongitude() == 0 && qrCode.getLongitude() == 0) return;
+        if(qrCode.getLatitude() == 0 && qrCode.getLongitude() == 0) return;
 
         LatLng qrLocation = new LatLng(qrCode.getLatitude(), qrCode.getLongitude());
         MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCode.getPoints());
