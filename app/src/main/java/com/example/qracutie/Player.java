@@ -24,7 +24,7 @@ public class Player {
     int pointTotal = 0; // the sum of all QR code points belonging to the Player
     int totalCodes = 0; // the count of all GameQRCodes collected by the player
 
-    HashMap<String, Bitmap> gameQRCodeImages = new HashMap<>(); // all images belonging to the player, mapped to GameQRCode hashes
+    HashMap<String, String> gameQRCodeImages = new HashMap<>(); // all images belonging to the player, mapped to GameQRCode hashes
 
     /**
      * public constructor. Creates an instance of the Player class
@@ -34,6 +34,10 @@ public class Player {
         this.username = username;
     }
 
+    /**
+     * No argument constructor for db
+     */
+    public Player() {}
     /**
      * returns username associated with Player
      * @return username
@@ -120,19 +124,14 @@ public class Player {
      * image parameter is not null, it adds an image to be associated with the QR code.
      * Updates the highest/lowest scoring QR codes and the sum of scores
      * @param qrCode a QR code to belong to the player
-     * @param image an image to associate to the QR code, or null
      */
-    public void addGameQRCode (GameQRCode qrCode, Bitmap image){
+    public void addGameQRCode (GameQRCode qrCode){
 
         int points = qrCode.getPoints();
 
         // add the qr code to the set of all codes
         gameQRCodes.add(qrCode);
 
-        // add an image, if provided
-        if (image != null) {
-            gameQRCodeImages.put(qrCode.getHash(), image);
-        }
 
         // add the qr code points to the point total
         pointTotal += points;
@@ -152,15 +151,23 @@ public class Player {
      */
     public void deleteGameQRCode (GameQRCode qrCode){
         // if array list does not contain qr code, throw an error
-        if (!gameQRCodes.contains(qrCode)) {
+        GameQRCode codeToDelete = null;
+
+        for (int i = 0; i < gameQRCodes.size(); i++) {
+            if (gameQRCodes.get(i).getHash().equals(qrCode.getHash())) {
+                codeToDelete = gameQRCodes.get(i);
+            }
+        }
+
+        if (codeToDelete == null) {
             throw new IllegalArgumentException("QR Code is not owned by player");
         }
 
         // remove the QR code from the array list
-        gameQRCodes.remove(qrCode);
+        gameQRCodes.remove(codeToDelete);
 
         // update point total
-        int points = qrCode.getPoints();
+        int points = codeToDelete.getPoints();
         pointTotal -= points;
 
         // update highest and lowest scoring qr codes
@@ -186,11 +193,17 @@ public class Player {
         return gameQRCodes;
     }
 
+    public Boolean checkIfGameQRCodeScanned(String newCodeHash) {
+        for(GameQRCode scannedCodes : getGameQRCodes()){
+            if(scannedCodes.getHash().equals(newCodeHash)) return true;
+        }
+        return false;
+    }
     /**
      * returns a hashmap of Bitmap images associated with a game QR code
      * @return hashmap
      */
-    public HashMap<String, Bitmap> getGameQRCodeImages () {
+    public HashMap<String, String> getGameQRCodeImages () {
         return gameQRCodeImages;
     }
 
@@ -233,5 +246,17 @@ public class Player {
      */
     public int getTotalCodes () {
         return totalCodes;
+    }
+
+    public void setGameQRCodes(ArrayList<GameQRCode> newList) {
+        this.gameQRCodes = newList;
+    }
+
+    public void setGameQRCodeImages(HashMap<String, String> newMap) {
+        this.gameQRCodeImages = newMap;
+    }
+
+    public void addImage(String hash, String image) {
+        this.gameQRCodeImages.put(hash, image);
     }
 }

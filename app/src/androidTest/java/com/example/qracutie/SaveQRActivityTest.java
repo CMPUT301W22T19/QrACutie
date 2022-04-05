@@ -77,8 +77,8 @@ public class SaveQRActivityTest {
         Button button = (Button) solo.getView(R.id.CapturePic);
         solo.clickOnView(button);
 
-        // Asserts that the current activity stays in SaveQR activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
+        // Asserts that the current activity switches too SaveImage activity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", SaveImageActivity.class);
     }
 
     /**
