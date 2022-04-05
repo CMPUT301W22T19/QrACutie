@@ -1,41 +1,63 @@
 package com.example.qracutie;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.SearchView;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.widget.Button;
+import android.os.Environment;
+
+import android.provider.MediaStore;
+
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -47,39 +69,28 @@ import java.util.concurrent.ThreadLocalRandom;
  * of all players, sorted according to some specified criteria.
  */
 public class MainActivity extends AppCompatActivity {
-
-    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
-
     private Button userAccountButton;
-    private ImageButton userQrButton;
     private TextView nameDisplayed;
+    private ImageView profile;
+    private Button myCollection;
+    private Button cameraButton;
+    private SearchView searchView;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("profileImages");
+
     private static final String SHARED_PREFS = "sharedPrefs";
     private static final String TEXT = "username";
-
+    public static final String EXTRA_PLAYER_USERNAME = "com.example.qracutie.EXTRA_PLAYER_USERNAME";
     public static final String EXTRA_PLAYER_COLLECTION_USERNAME = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_USERNAME";
-    public static final String EXTRA_PLAYER_COLLECTION_ISOWNER = "com.example.qracutie.EXTRA_PLAYER_COLLECTION_ISOWNER";
 
     private Player player;
     private String username = "";
-    private String email = "";
-    private String phonenumber = "";
+    private Boolean isPlayerSet = false;
 
-    private ImageView profile;
-    private Button userCollectionButton;
-    private String profile_image = "profileImage";
-    private String profile_image_uri = "";
-    private String profile_image_stored = "";
-    private Uri uri;
-    private String url = "";
-
-    private Boolean onCreated = false;
-
-    private Bitmap bitmap;
-
-    private ArrayList<Player> playerList = new ArrayList<>();
+    private ListView playerList;
+    private PlayerListAdapter playerListAdapter;
+    private ArrayList<Player> playerDataList = new ArrayList<>();
 
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -87,10 +98,15 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getData() != null){
-                        uri = result.getData().getData();
-                        profile_image_uri = uri.toString(); //added now
-                        draw_profile_image();
-                        uploadProfileImage(bitmap);
+                        Uri uri = result.getData().getData();
+                        player.setProfileImage(uri.toString());
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = draw_profile_image(uri);
+                            uploadProfileImage(bitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -107,11 +123,49 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
 
-        mapButton = (ImageButton)findViewById(R.id.mapButton);
+        mapButton = (ImageButton) findViewById(R.id.mapButton);
+        userAccountButton = (Button) findViewById(R.id.user_account_button);
+        nameDisplayed = (TextView) findViewById(R.id.display_name);
+        profile = (ImageView) findViewById(R.id.profile_picture);
+        myCollection = (Button) findViewById(R.id.collection_button);
+        searchView = (SearchView) findViewById(R.id.searchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // From: tutorialspoint
+                // Url: https://www.tutorialspoint.com/How-to-remove-all-whitespace-from-String-in-Java#:~:text=The%20replaceAll()%20method%20of,replacing%20%22%20%22%20with%20%22%22.
+                // Author: Anjana
+                db.collection("users").document(query.replaceAll(" ","")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.getResult().exists()){
+                            String searched_image = task.getResult().get("profileImage").toString();
+                            String searched_username = task.getResult().get("username").toString();
+                            String searched_highestQR = task.getResult().get("highestQRCode").toString();
+                            String searched_total = task.getResult().get("totalCodes").toString();
+                            Intent intent = new Intent(MainActivity.this, SearchPlayer.class);
+                            intent.putExtra("searched_image", searched_image);
+                            intent.putExtra("searched_username", searched_username);
+                            intent.putExtra("searched_highestQR", searched_highestQR);
+                            intent.putExtra("searched_total", searched_total);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(getApplicationContext(), "User does not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,12 +173,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        userAccountButton = (Button) findViewById(R.id.user_account_button);
-        userQrButton = (ImageButton) findViewById(R.id.user_qr_button);
-        nameDisplayed = (TextView) findViewById(R.id.display_name);
 
-        onCreated = true;
-        profile = (ImageView) findViewById(R.id.profile_picture);
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // add on click listener for my collection button
-        Button myCollection = findViewById(R.id.collection_button);
         myCollection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,64 +189,112 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button button1 = (Button)findViewById(R.id.cameraButton);
-        button1.setOnClickListener(view -> {
-            Intent intent = new Intent(view.getContext(), CameraActivity.class);
-            view.getContext().startActivity(intent);});
 
+        playerExistence();
+
+        cameraButton = (Button) findViewById(R.id.cameraButton);
+        cameraButton.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), CameraActivity.class);
+                //intent.putExtra("player", (new Gson()).toJson(player));
+                intent.putExtra("username", username);
+                view.getContext().startActivity(intent);
+        });
+
+        // create leaderboard array adapter
+        playerList = findViewById(R.id.leaderboard);
+        playerDataList = new ArrayList<>();
+        playerListAdapter = new PlayerListAdapter(this, playerDataList);
+        playerList.setAdapter(playerListAdapter);
+
+        // create leaderboard sorting buttons
+        TabLayout leaderboardTabs = findViewById(R.id.leaderboard_tabs);
+        leaderboardTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch(tab.getPosition()) {
+                    case 0:
+                        updateRank("pointTotal");
+                        updateLeaders("pointTotal", 10);
+                        break;
+                    case 1:
+                        updateRank("totalCodes");
+                        updateLeaders("totalCodes", 10);
+                        break;
+                    case 2:
+                        updateRank("highestQRCode");
+                        updateLeaders("highestQRCode", 10);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+
+        // set the user's rank
+        updateRank("pointTotal");
+
+        // set the leaderboard
+        updateLeaders("pointTotal", 10); // replaces empty leader board
+    }
+
+    private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
+        // or owner deleted their own player profile
         if (username.equals("")){
             generateUniqueUsername();
         }else{
             // user already exists in the database
-            nameDisplayed.setText(username);
-            player = new Player(username);
             getPlayerInfo();
-            // From: Youtube
-            // URL: https://www.youtube.com/watch?v=xzCsJF9WtPU&ab_channel=EasyLearn
-            // Author: EasyLearn
-            StorageReference ref = storageReference.child(username+".jpeg");
-            try {
-                final File localFile = File.createTempFile(username, ".jeg");
-                ref.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        Bitmap bmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                        float fwidth = bmap.getWidth();
-                        float fheight = bmap.getHeight();
-                        float ratio;
-                        Integer width;
-                        Integer height;
-                        if(fwidth < fheight){
-                            ratio = fwidth/120;
-                            fheight = fheight/ratio;
-                            width = 120;
-                            height = (Integer) Math.round(fheight);
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
-                        }else if(fheight < fwidth){
-                            ratio = fheight/120;
-                            fwidth = fwidth/ratio;
-                            width = (Integer) Math.round(fwidth);
-                            height = 120;
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, width, height, false));
-                        }else{
-                            profile.setImageBitmap(Bitmap.createScaledBitmap(bmap, 120, 120, false));
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        sharedPreferences = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        sharedPreferences.edit().clear().commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Intent intent = getIntent();
+        String prevActivity = intent.getStringExtra("activity");
+        if(prevActivity != null && prevActivity.equals("ownerspage") && intent.getBooleanExtra("ownerDeletedSelf",false) == true){
+            clearPlayerFromStorage();
+        }
+        playerExistence();
+    }
+
+    private void clearPlayerFromStorage() {
+        FirebaseStorage.getInstance().getReference().child("gameQRcodeImages").child(username).delete();
+    }
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        if(menu instanceof MenuBuilder){
+            MenuBuilder m = (MenuBuilder) menu;
+            m.setOptionalIconsVisible(true);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.owner_login_button){
+            Intent intent = new Intent(MainActivity.this, OwnerLogin.class);
+            intent.putExtra("username", player.getUsername());
+            startActivity(intent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -206,32 +302,21 @@ public class MainActivity extends AppCompatActivity {
      * details of a specific player profile, including player statistics and a list of all
      * QR Codes which have been collected
      */
-    private void openPlayerCollectionActivity(Player playerToView) {
+    public void openPlayerCollectionActivity(Player playerToView) {
 
         Intent intent = new Intent(this, PlayerCollectionActivity.class);
-
+        intent.putExtra(EXTRA_PLAYER_USERNAME, this.player.getUsername());
         intent.putExtra(EXTRA_PLAYER_COLLECTION_USERNAME, playerToView.getUsername());
-
-        if (playerToView.getUsername().equals(this.player.getUsername())) {
-            // player would like to view their own collection
-            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, true);
-        } else {
-            // player would like to view someone else's collection
-            intent.putExtra(EXTRA_PLAYER_COLLECTION_ISOWNER, false);
-        }
-
         startActivity(intent);
     }
 
     /**
      * Draws the player's profile image
      */
-    private void draw_profile_image(){
-        try{
-            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            profile.setImageBitmap(bitmap);
-        }catch (IOException e){
-        }
+    private Bitmap draw_profile_image(Uri uri) throws IOException {
+        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+        profile.setImageBitmap(bitmap);
+        return bitmap;
     }
 
     /**
@@ -312,6 +397,11 @@ public class MainActivity extends AppCompatActivity {
      * Creates the player in Firebase
      */
     private void createNewUser(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(TEXT, username);
+        editor.apply();
+        nameDisplayed.setText(username);
         player = new Player(username);
         db.collection("users").document(username).set(player);
     }
@@ -322,41 +412,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveUser();
+        saveUserInfo("saveProfileImage");
     }
 
     /**
      * Saves player name
      */
-    protected void saveUser(){
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(TEXT, username);
-        editor.apply();
-        savePlayerInfo();
-    }
-
-    /**
-     * Saves player attributes
-     */
-    private void savePlayerInfo(){
+    protected void saveUserInfo(String called){
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                profile_image_uri = player.getProfileImage();
-                if(!profile_image_stored.equals(profile_image_uri)){
-                    db.collection("users").document(username).update(profile_image, profile_image_uri);
-                }
-                if(!email.equals(player.getEmail())){
+                if(called.equals("account")){
                     db.collection("users").document(username).update("email", player.getEmail());
-
-                }
-                if(!phonenumber.equals(player.getPhoneNumber())){
-                    db.collection("users").document(username).update("phoneNumber", player.getPhoneNumber());
-                }
-
-                if(!username.equals(player.getUsername())){
-                    db.collection("users").document(username).update("username", player.getUsername());
+                    db.collection("users").document(username).update("phonenumber", player.getPhoneNumber());
+                }else{
+                    db.collection("users").document(username).update("profileImage", player.getProfileImage());
                 }
             }
         });
@@ -369,11 +439,142 @@ public class MainActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                player.setEmail(task.getResult().get("email").toString());
-                player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
-                email = player.getEmail();
-                phonenumber = player.getPhoneNumber();
-                url = task.getResult().get("profileImage").toString();
+                if(task.getResult().exists()){
+                    player = new Player(username);
+                    ArrayList<GameQRCode> orig_gameQrCodes = (ArrayList<GameQRCode>) task.getResult().get("gameQRCodes");
+                    HashMap<String, String> orig_gameQRCodeImages = (HashMap<String, String>) task.getResult().get("gameQRCodeImages");
+                    player.setGameQRCodes(orig_gameQrCodes);
+                    player.setGameQRCodeImages(orig_gameQRCodeImages);
+                    player.highestQRCode = (int) (long) task.getResult().get("highestQRCode");
+                    player.lowestQRCode = (int) (long) task.getResult().get("lowestQRCode");
+                    player.pointTotal = (int) (long) task.getResult().get("pointTotal");
+                    player.totalCodes = (int) (long) task.getResult().get("totalCodes");
+                    String orig_profile_image = task.getResult().get("profileImage").toString();
+                    String orig_email = task.getResult().get("email").toString();
+                    String orig_phonenumber = task.getResult().get("phoneNumber").toString();
+                    player.setEmail(orig_email);
+                    player.setPhoneNumber(orig_phonenumber);
+                    player.setProfileImage(orig_profile_image);
+                    Glide.with(getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(profile);
+                    nameDisplayed.setText(username);
+                    isPlayerSet = true;
+                }else{
+                    // user is in shared preferences not in the database, meaning they no longer exist
+                    // because the owner has deleted them
+                    clearPlayerFromStorage();
+                    generateUniqueUsername();
+                    isPlayerSet = true;
+                }
+            }
+        });
+    }
+
+    /**
+     * Retrieves a set amount of users at the top of some type of leaderboard
+     */
+    private void updateLeaders(String type, int limit){
+
+        // clear player collection
+        playerDataList.clear();
+
+        // update leaderboard type
+        playerListAdapter.setDisplay(type);
+
+        // update leaderboard values
+        db.collection("users")
+                .orderBy(type, Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        int rank = 1;
+                        String rankText = "#";
+
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            // load player from database
+                            Player newLeader = new Player(doc.get("username").toString());
+                            newLeader.pointTotal = doc.getLong("pointTotal").intValue();
+                            newLeader.totalCodes = doc.getLong("totalCodes").intValue();
+                            newLeader.highestQRCode = doc.getLong("highestQRCode").intValue();
+                            if (!doc.getString("profileImage").toString().equals("")) {
+                                newLeader.profileImage = doc.getString("profileImage").toString();
+                            } else {
+                                newLeader.profileImage = "";
+                            }
+
+                            // add player to data list
+                            playerDataList.add(newLeader);
+
+                            // update user rank
+                            if (newLeader.getUsername().equals(username)) {
+                                rankText += String.valueOf(rank);
+                            }
+                            // increment rank
+                            rank++;
+
+                        }
+                        // update leaderboard
+                        playerListAdapter.notifyDataSetChanged();
+
+                        // if user rank was not updated, get an estimate for user rank
+                        if (!rankText.equals("#")) {
+                            // display user rank
+                            TextView playerRank = findViewById(R.id.player_rank);
+                            playerRank.setText(rankText);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Retrieves a rank for the user based on firebase ranking map. Updates firebase rankings
+     * if no update has occurred within the past hour
+     */
+    private void updateRank(String type) {
+        // check when time of last update was
+        db.collection("rankings").document(type).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                //HashMap<String, Integer> rankings = (HashMap<String, Integer>) task.getResult().get("ranks");
+                int lastUpdate = task.getResult().getLong("lastUpdate").intValue();
+                int currentTime = (int) (System.currentTimeMillis() / 1000);
+
+                // if last update is less than an hour before the current time,
+                // set the user rank. Otherwise, update all user rankings
+                if (currentTime - lastUpdate < 3600 && task.getResult().get(username) != null) {
+                    // set rankings value
+                    TextView playerRank = findViewById(R.id.player_rank);
+                    String rankText = "#" + task.getResult().get(username);
+                    playerRank.setText(rankText);
+                } else {
+                    db.collection("users")
+                            .orderBy(type, Query.Direction.DESCENDING)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> qstask) {
+
+                                    // build rankings hashmap
+                                    int rank = 1;
+                                    HashMap<String, Integer> map = new HashMap<>();
+                                    map.put("lastUpdate", currentTime);
+
+                                    for (DocumentSnapshot doc : qstask.getResult()) {
+                                        map.put(doc.get("username").toString(), rank++);
+                                    }
+
+                                    // save hashmap to database
+                                    db.collection("rankings").document(type).set(map);
+
+                                    // display user rank
+                                    TextView playerRank = findViewById(R.id.player_rank);
+                                    String rankText = "#" + map.get(username);
+                                    playerRank.setText(rankText);
+                                }
+                            });
+                }
             }
         });
     }
@@ -384,7 +585,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void userAccountButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this,Account.class);
-
         startActivityIfNeeded(intent, 255);
     }
 
@@ -407,6 +607,9 @@ public class MainActivity extends AppCompatActivity {
             }
             if(!UPhonenumber.equals("")){
                 player.setPhoneNumber(info.getString("phonenumber"));
+            }
+            if(!UEmail.equals("") || !UPhonenumber.equals("")){
+                saveUserInfo("account");
             }
         }
     }

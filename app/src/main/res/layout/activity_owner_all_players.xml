@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background = "@drawable/gradient_drawable">
+
+    <LinearLayout
+        android:id="@+id/L_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="400dp"
+            android:layout_height="500dp">
+        </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/L_Qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/QR_recycler_view"
+            android:layout_width="400dp"
+            android:layout_height="500dp">
+        </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:visibility="visible"
+        android:id="@+id/to_qr_list"
+        android:text="QR Codes"
+        android:textColor="@color/white"
+        android:fontFamily="@font/open_sans_semibold"
+        android:layout_width="120dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/L_player"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="toQRListClicked"
+        android:background="@drawable/button"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:visibility="gone"
+        android:id="@+id/to_player_list"
+        android:text="Players"
+        android:textColor="@color/white"
+        android:fontFamily="@font/open_sans_semibold"
+        android:layout_width="120dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/L_Qr"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="toPlayerListClicked"
+        android:background="@drawable/button"/>
+
+</RelativeLayout>

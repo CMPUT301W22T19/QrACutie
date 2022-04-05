@@ -1,9 +1,15 @@
 package com.example.qracutie;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,15 +18,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The player collection activity display's a players statistics and
@@ -29,18 +35,15 @@ import java.util.ArrayList;
  */
 public class PlayerCollectionActivity extends AppCompatActivity {
 
-    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
-    private static final String SHARED_PREFS = "sharedPrefs";
-    private static final String TEXT = "username";
-
-    private String username = "";
-
     public static final String EXTRA_COMMENTS_USERNAME = "com.example.qracutie.EXTRA_COMMENTS_USERNAME";
     public static final String EXTRA_COMMENTS_QRCODE = "com.example.qracutie.EXTRA_COMMENTS_QRCODE";
 
     ListView qrCodeList;
     ArrayAdapter<GameQRCode> qrCodeAdapter;
     ArrayList<GameQRCode> qrCodeDataList;
+
+    String viewer;
+    String personToView;
 
     Player player;
 
@@ -53,49 +56,78 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         // load player from db
         Intent intent = getIntent();
-        String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+        viewer = intent.getStringExtra(MainActivity.EXTRA_PLAYER_USERNAME);
+        personToView = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
 
-        // Get current user's username
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        String currentUser = sharedPreferences.getString(TEXT, "");
+        // load player from database
+        loadUser(this, personToView, new MyCallBack() {
+            @Override
+            public void onCallBack(Context context, Player player) {
+                // initialize player username
+                TextView usernameView = findViewById(R.id.collection_username);
+                usernameView.setText(player.getUsername());
 
-        // If the user being shown and the current user are not the same, hide the shareable qr code button
-        if (!username.equals(currentUser)) {
+                // initialize player image
+                ImageView playerImage = findViewById(R.id.collection_player_image);
+                Glide.with(context).clear(playerImage);
+                if (!player.getProfileImage().equals("")) {
+                    Glide.with(context).asBitmap().load(Uri.parse(player.getProfileImage()))
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true)
+                            .into(playerImage);
+                } else {
+                    playerImage.setImageResource(R.drawable.default_profile_pic);
+                }
 
-            View b = findViewById(R.id.user_qr_button);
-            b.setVisibility(View.GONE);
-        }
+                // initialize player statistics
+                setPlayerStats();
 
+                // initialize page with player qr codes
+                qrCodeList = findViewById(R.id.qr_code_list);
+                qrCodeDataList = player.getGameQRCodes();
+                boolean enableOptions = viewer.equals(player.getUsername());
+                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
+                qrCodeList.setAdapter(qrCodeAdapter);
+            }
+        });
+    }
 
+    /**
+     * Defines an onCallBack method for initializing the collections page with data
+     */
+    private interface MyCallBack {
+        /**
+         * Initializes the player collections page with data
+         */
+        void onCallBack(Context context, Player player);
+    }
+
+    /**
+     * Loads a user profile in from firebase, including all user statistics, user QR codes,
+     * and images associated to QR codes. Accepts a callback.
+     * @param context context of caller
+     * @param username profile to load from firestore
+     * @param myCallBack a callback class
+     */
+    private void loadUser(Context context, String username, MyCallBack myCallBack) {
         player = new Player(username);
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 player.setEmail(task.getResult().get("email").toString());
                 player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
+                player.setProfileImage(task.getResult().get("profileImage").toString());
+                player.setGameQRCodeImages((HashMap<String, String>) task.getResult().get("gameQRCodeImages"));
+                player.setGameQRCodes((ArrayList<GameQRCode>) task.getResult().get("gameQRCode"));
+                myCallBack.onCallBack(context, player);
             }
         });
-        Bitmap defaultPic = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_profile_pic);
-        player.setProfilePic(defaultPic);
+    }
 
-        // TODO remove
-        // Add GameQR codes to player so that there is visible content on the screen in testing
-        GameQRCode testCode1 = new GameQRCode("258f43b98430f4b5e50822bbb1070038233e286d6315ce19cb6fc0c02794eb97", 20);
-        GameQRCode testCode2 = new GameQRCode("2f0eb1859e295bcd183127558f3c205270e7a8004ad362e5123bd5b2774e0f9c", 50);
-        GameQRCode testCode3 = new GameQRCode("11", 10);
-
-        player.addGameQRCode(testCode1, null);
-        player.addGameQRCode(testCode2, null);
-        player.addGameQRCode(testCode3, null);
-        // TODO remove ^
-
-        // initialize player username and image
-        ImageView profileImage = findViewById(R.id.collection_player_image);
-        profileImage.setImageBitmap(player.getProfilePic());
-
-        TextView usernameView = findViewById(R.id.collection_username);
-        usernameView.setText(player.getUsername());
-
+    /**
+     * Sets player statistics to be visible on the page
+     */
+    private void setPlayerStats() {
         // initialize page with player statistics
         TextView totalCodes = findViewById(R.id.collection_total_codes_val);
         totalCodes.setText(String.valueOf(player.getTotalCodes()));
@@ -108,21 +140,6 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         TextView lowestScore = findViewById(R.id.collection_lowest_score_val);
         lowestScore.setText(String.valueOf(player.getLowestQRCode()));
-
-
-        // initialize page with player qr codes
-        qrCodeList = findViewById(R.id.qr_code_list);
-        qrCodeDataList = player.getGameQRCodes();
-        qrCodeAdapter = new GameQRCodeAdapter(this, qrCodeDataList, player.getGameQRCodeImages());
-        qrCodeList.setAdapter(qrCodeAdapter);
-
-        // add a click listener for any element of the QR Code list
-        qrCodeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                viewCommentsActivity(qrCodeDataList.get(i));
-            }
-        });
     }
 
     /**
@@ -134,19 +151,35 @@ public class PlayerCollectionActivity extends AppCompatActivity {
      */
     protected void viewCommentsActivity(GameQRCode qrCode) {
         Intent intent = new Intent(this, CommentsPage.class);
-        intent.putExtra(EXTRA_COMMENTS_USERNAME, player.getUsername());
+        intent.putExtra(EXTRA_COMMENTS_USERNAME, viewer);
         intent.putExtra(EXTRA_COMMENTS_QRCODE, qrCode.getHash());
         startActivity(intent);
         return;
     }
 
     /**
-     * Onclick method for when the user accesses their account info (email and phone number)
-     * @param view
+     * displays a fragment that shows more information about a QR code,
+     * and allows the player to delete the QR code if they own it
      */
-    public void userQrButtonClicked(View view) {
-        Intent intent = new Intent(PlayerCollectionActivity.this, ShareableQrActivity.class);
-        intent.putExtra(EXTRA_COMMENTS_TYPE, "information");
-        startActivityIfNeeded(intent, 255);
+    protected void showOptions(GameQRCode qrCode) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder
+            .setMessage("Would you like to delete this QR Code?")
+            .setNegativeButton("No", null)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // remove qr code from player profile
+                    player.deleteGameQRCode(qrCode);
+
+                    // update page statistics
+                    setPlayerStats();
+
+                    // remove qr code from screen
+                    qrCodeAdapter.remove(qrCode);
+                    qrCodeAdapter.notifyDataSetChanged();
+                }
+            }).create().show();
     }
 }

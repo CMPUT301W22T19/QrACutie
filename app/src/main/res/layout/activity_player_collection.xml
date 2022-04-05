@@ -4,24 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerCollectionActivity"
-    android:background = "@drawable/gradient_drawable">
+    android:background="@drawable/gradient_drawable"
+    tools:context=".PlayerCollectionActivity">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center"
-        app:cardCornerRadius="250dp"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="250dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/collection_player_image"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
@@ -32,8 +32,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/username"
-        app:layout_constraintStart_toEndOf="@+id/cardView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <ImageButton
         android:id="@+id/user_qr_button"
@@ -52,84 +52,97 @@
         android:id="@+id/collection_total_codes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/total_codes"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:maxLines="2"
+        android:text="@string/total_n_codes"
+        app:layout_constraintStart_toEndOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/collection_total_codes_val" />
 
     <TextView
         android:id="@+id/collection_total_codes_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/_0"
-        app:layout_constraintBottom_toBottomOf="@+id/collection_total_codes"
-        app:layout_constraintStart_toEndOf="@+id/collection_total_codes" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/collection_total_codes"
+        app:layout_constraintStart_toStartOf="@+id/collection_total_codes"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/collection_total_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/total_points"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/collection_total_codes" />
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/total_n_points"
+        app:layout_constraintStart_toEndOf="@+id/collection_total_codes"
+        app:layout_constraintTop_toBottomOf="@+id/collection_total_points_val" />
 
     <TextView
         android:id="@+id/collection_total_points_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/_0"
-        app:layout_constraintBottom_toBottomOf="@+id/collection_total_points"
-        app:layout_constraintStart_toEndOf="@+id/collection_total_points" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/collection_total_points"
+        app:layout_constraintStart_toStartOf="@+id/collection_total_points"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/collection_highest_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/highest_score"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/collection_total_points" />
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/highest_n_score"
+        app:layout_constraintStart_toEndOf="@+id/collection_total_points"
+        app:layout_constraintTop_toBottomOf="@+id/collection_highest_score_val" />
 
     <TextView
         android:id="@+id/collection_highest_score_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/_0"
-        app:layout_constraintBottom_toBottomOf="@+id/collection_highest_score"
-        app:layout_constraintStart_toEndOf="@+id/collection_highest_score" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/collection_highest_score"
+        app:layout_constraintStart_toStartOf="@+id/collection_highest_score"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/collection_lowest_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/lowest_score"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/collection_highest_score" />
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/lowest_n_score"
+        app:layout_constraintStart_toEndOf="@+id/collection_highest_score"
+        app:layout_constraintTop_toBottomOf="@+id/collection_lowest_score_val" />
 
     <TextView
         android:id="@+id/collection_lowest_score_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
         android:text="@string/_0"
-        app:layout_constraintBottom_toBottomOf="@+id/collection_lowest_score"
-        app:layout_constraintStart_toEndOf="@+id/collection_lowest_score" />
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/collection_lowest_score"
+        app:layout_constraintStart_toStartOf="@+id/collection_lowest_score"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/qr_code_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/collection_lowest_score" />
+        app:layout_constraintTop_toBottomOf="@+id/collection_username" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
