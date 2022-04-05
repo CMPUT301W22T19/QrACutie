@@ -259,11 +259,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateNearbyQRCodeList(GameQRCode qrCode, double distance) {
         int barcode_icon = R.drawable.stock_barcode_icon;
-        if (qrCode.getPoints() < 500) barcode_icon = R.drawable.green_barcode_icon;
-        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1750) barcode_icon = R.drawable.yellow_barcode_icon;
-        if (qrCode.getPoints() >= 1750 && qrCode.getPoints() < 3000) barcode_icon = R.drawable.orange_barcode_icon;
-        if (qrCode.getPoints() >= 3000 && qrCode.getPoints() < 6500) barcode_icon = R.drawable.red_barcode_icon;
-        if (qrCode.getPoints() >= 6500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() < 100) barcode_icon = R.drawable.green_barcode_icon;
+        if (qrCode.getPoints() >= 100 && qrCode.getPoints() < 500) barcode_icon = R.drawable.yellow_barcode_icon;
+        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1000) barcode_icon = R.drawable.orange_barcode_icon;
+        if (qrCode.getPoints() >= 1000 && qrCode.getPoints() < 5000) barcode_icon = R.drawable.red_barcode_icon;
+        if (qrCode.getPoints() >= 5000 && qrCode.getPoints() < 7500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() >= 7500) barcode_icon = R.drawable.blue_barcode_icon;
 
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(barcode_icon);
         Bitmap b = bitmapdraw.getBitmap();
@@ -302,9 +303,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void addBarcodeMarker(GameQRCode qrCode) {
-        if(qrCode.getLatitude() == 0 && qrCode.getLongitude() == 0) {
-            return;
-        }
+        if(qrCode.getLongitude() == 0 && qrCode.getLongitude() == 0) return;
+
         LatLng qrLocation = new LatLng(qrCode.getLatitude(), qrCode.getLongitude());
         MarkerOptions marker = new MarkerOptions().position(qrLocation).title("Barcode: " + qrCode.getPoints());
         double distance = getDistance(marker.getPosition().latitude, marker.getPosition().longitude, playerMarker.getPosition().latitude, playerMarker.getPosition().longitude);
@@ -319,11 +319,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int width = 100;
         int barcode_icon = R.drawable.stock_barcode_icon;
 
-        if (qrCode.getPoints() < 500) barcode_icon = R.drawable.green_barcode_icon;
-        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1750) barcode_icon = R.drawable.yellow_barcode_icon;
-        if (qrCode.getPoints() >= 1750 && qrCode.getPoints() < 3000) barcode_icon = R.drawable.orange_barcode_icon;
-        if (qrCode.getPoints() >= 3000 && qrCode.getPoints() < 6500) barcode_icon = R.drawable.red_barcode_icon;
-        if (qrCode.getPoints() >= 6500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() < 100) barcode_icon = R.drawable.green_barcode_icon;
+        if (qrCode.getPoints() >= 100 && qrCode.getPoints() < 500) barcode_icon = R.drawable.yellow_barcode_icon;
+        if (qrCode.getPoints() >= 500 && qrCode.getPoints() < 1000) barcode_icon = R.drawable.orange_barcode_icon;
+        if (qrCode.getPoints() >= 1000 && qrCode.getPoints() < 5000) barcode_icon = R.drawable.red_barcode_icon;
+        if (qrCode.getPoints() >= 5000 && qrCode.getPoints() < 7500) barcode_icon = R.drawable.purple_barcode_icon;
+        if (qrCode.getPoints() >= 7500) barcode_icon = R.drawable.blue_barcode_icon;
 
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(barcode_icon);
         Bitmap b = bitmapdraw.getBitmap();
