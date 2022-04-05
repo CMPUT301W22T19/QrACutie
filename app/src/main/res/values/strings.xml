@@ -10,6 +10,11 @@
     <string name="username">username</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="highest_n_score">Highest\nScore</string>
+    <string name="total_n_codes">Total\nCodes</string>
+    <string name="total_n_points">Total\nPoints</string>
+    <string name="lowest_n_score">Lowest\nScore</string>
+    <string name="total_scans">Total Scans</string>
     <string name="qr_code">qr_code</string>
     <string name="enter_your_info">Enter your info</string>
     <string name="generate_qr_code">Generate QR Code</string>
