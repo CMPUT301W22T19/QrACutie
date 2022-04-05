@@ -41,6 +41,7 @@ public class PlayerCollectionActivity extends AppCompatActivity {
     ListView qrCodeList;
     ArrayAdapter<GameQRCode> qrCodeAdapter;
     ArrayList<GameQRCode> qrCodeDataList;
+    HashMap <String, String> qrCodeImages;
 
     String viewer;
     String personToView;
@@ -85,8 +86,15 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                 // initialize page with player qr codes
                 qrCodeList = findViewById(R.id.qr_code_list);
                 qrCodeDataList = player.getGameQRCodes();
+                if (qrCodeDataList == null) {
+                    qrCodeDataList = new ArrayList<>();
+                }
+                qrCodeImages = player.getGameQRCodeImages();
+                if (qrCodeImages == null) {
+                    qrCodeImages = new HashMap<>();
+                }
                 boolean enableOptions = viewer.equals(player.getUsername());
-                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
+                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, qrCodeImages, enableOptions);
                 qrCodeList.setAdapter(qrCodeAdapter);
             }
         });
@@ -114,11 +122,29 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                // retrieve player information
                 player.setEmail(task.getResult().get("email").toString());
                 player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
                 player.setProfileImage(task.getResult().get("profileImage").toString());
-                player.setGameQRCodeImages((HashMap<String, String>) task.getResult().get("gameQRCodeImages"));
-                player.setGameQRCodes((ArrayList<GameQRCode>) task.getResult().get("gameQRCode"));
+
+                // retrieve player images
+                HashMap<String, String> qrCodeImageMap = (HashMap<String, String>) task.getResult().get("gameQRCodeImages");
+                player.setGameQRCodeImages(qrCodeImageMap);
+
+                // retrieve player QR codes
+                ArrayList<HashMap<String, Object>> qrCodeMap = (ArrayList<HashMap<String, Object>>) task.getResult().get("gameQRCodes");
+                ArrayList<GameQRCode> qrCodeList = new ArrayList<>();
+                for (HashMap<String, Object> hMap : qrCodeMap) {
+                    GameQRCode newCode = new GameQRCode((String) hMap.get("hash"), ((Long) hMap.get("points")).intValue());
+                    newCode.setAmountOfScans(((Long) hMap.get("amountOfScans")).intValue());
+                    newCode.setLongitude((Double) hMap.get("longitude"));
+                    newCode.setLatitude((Double) hMap.get("latitude"));
+                    qrCodeList.add(newCode);
+                    player.addGameQRCode(newCode);
+                }
+                player.setGameQRCodes(qrCodeList);
+
+                // go to callback
                 myCallBack.onCallBack(context, player);
             }
         });

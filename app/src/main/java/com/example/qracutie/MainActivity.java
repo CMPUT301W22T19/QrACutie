@@ -424,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(called.equals("account")){
                     db.collection("users").document(username).update("email", player.getEmail());
-                    db.collection("users").document(username).update("phonenumber", player.getPhoneNumber());
+                    db.collection("users").document(username).update("phoneNumber", player.getPhoneNumber());
                 }else{
                     db.collection("users").document(username).update("profileImage", player.getProfileImage());
                 }
@@ -585,6 +585,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void userAccountButtonClicked(View view) {
         Intent intent = new Intent(MainActivity.this,Account.class);
+        intent.putExtra("username", player.getUsername());
         startActivityIfNeeded(intent, 255);
     }
 
