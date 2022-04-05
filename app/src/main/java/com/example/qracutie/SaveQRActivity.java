@@ -72,6 +72,10 @@ public class SaveQRActivity extends AppCompatActivity {
         // If qr code is a login qr code, log in player
         if (qrCodeStringParts[0] == "login") {
 
+
+            // Change shared preferences user name to username from qr code
+            // Launch main activity
+            // Pass new login flag through the intent.putExtra()
         }
         // if qr code is a shareable qr code, launch player info activity
         else if (qrCodeStringParts[0] == "information") {
