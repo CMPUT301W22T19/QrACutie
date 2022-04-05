@@ -74,6 +74,11 @@
         <activity android:name=".OwnerLogin"></activity>
         <activity android:name=".OwnerAllPlayers"></activity>
         <activity android:name=".SearchPlayer"></activity>
+
+        <activity
+            android:name=".ShareableQrActivity"
+            android:label="ShareableQrActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
