@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.gson.Gson;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -28,7 +29,10 @@ public class SaveQRActivityTest {
                 @Override
                 protected Intent getActivityIntent (){
                     Intent intent = new Intent();
-                    intent.putExtra("qrcode","11");
+                    Player player = new Player("userTest");
+                    intent.putExtra("player",(new Gson()).toJson(player));
+                    intent.putExtra("activity", "SaveImageActivity");
+                    intent.putExtra("qrcode", "testqrcode");
                     return intent;
                 }
             };
