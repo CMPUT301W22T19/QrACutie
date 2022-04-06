@@ -59,6 +59,7 @@ public class Account extends AppCompatActivity {
                 String oldEmail = task.getResult().get("email").toString();
                 newEmail.setText(oldEmail);
                 String oldNumber = task.getResult().get("phoneNumber").toString();
+                if (oldNumber.equals("")) oldNumber = task.getResult().get("phonenumber").toString();
                 newPhonenumber.setText(oldNumber);
             }
         });
