@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -17,6 +18,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -35,12 +39,19 @@ import java.util.HashMap;
  */
 public class PlayerCollectionActivity extends AppCompatActivity {
 
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
+
     public static final String EXTRA_COMMENTS_USERNAME = "com.example.qracutie.EXTRA_COMMENTS_USERNAME";
     public static final String EXTRA_COMMENTS_QRCODE = "com.example.qracutie.EXTRA_COMMENTS_QRCODE";
 
     ListView qrCodeList;
     ArrayAdapter<GameQRCode> qrCodeAdapter;
     ArrayList<GameQRCode> qrCodeDataList;
+    HashMap <String, String> qrCodeImages;
 
     String viewer;
     String personToView;
@@ -56,6 +67,20 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         // load player from db
         Intent intent = getIntent();
+        String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+
+        // Get current user's username
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String currentUser = sharedPreferences.getString(TEXT, "");
+
+        // If the user being shown and the current user are not the same, hide the shareable qr code button
+        if (!username.equals(currentUser)) {
+
+            View b = findViewById(R.id.user_qr_button);
+            b.setVisibility(View.GONE);
+        }
+
+
         viewer = intent.getStringExtra(MainActivity.EXTRA_PLAYER_USERNAME);
         personToView = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
 
@@ -85,8 +110,15 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                 // initialize page with player qr codes
                 qrCodeList = findViewById(R.id.qr_code_list);
                 qrCodeDataList = player.getGameQRCodes();
+                if (qrCodeDataList == null) {
+                    qrCodeDataList = new ArrayList<>();
+                }
+                qrCodeImages = player.getGameQRCodeImages();
+                if (qrCodeImages == null) {
+                    qrCodeImages = new HashMap<>();
+                }
                 boolean enableOptions = viewer.equals(player.getUsername());
-                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, player.getGameQRCodeImages(), enableOptions);
+                qrCodeAdapter = new GameQRCodeAdapter(context, qrCodeDataList, qrCodeImages, enableOptions);
                 qrCodeList.setAdapter(qrCodeAdapter);
             }
         });
@@ -114,11 +146,29 @@ public class PlayerCollectionActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                // retrieve player information
                 player.setEmail(task.getResult().get("email").toString());
                 player.setPhoneNumber(task.getResult().get("phoneNumber").toString());
                 player.setProfileImage(task.getResult().get("profileImage").toString());
-                player.setGameQRCodeImages((HashMap<String, String>) task.getResult().get("gameQRCodeImages"));
-                player.setGameQRCodes((ArrayList<GameQRCode>) task.getResult().get("gameQRCode"));
+
+                // retrieve player images
+                HashMap<String, String> qrCodeImageMap = (HashMap<String, String>) task.getResult().get("gameQRCodeImages");
+                player.setGameQRCodeImages(qrCodeImageMap);
+
+                // retrieve player QR codes
+                ArrayList<HashMap<String, Object>> qrCodeMap = (ArrayList<HashMap<String, Object>>) task.getResult().get("gameQRCodes");
+                ArrayList<GameQRCode> qrCodeList = new ArrayList<>();
+                for (HashMap<String, Object> hMap : qrCodeMap) {
+                    GameQRCode newCode = new GameQRCode((String) hMap.get("hash"), ((Long) hMap.get("points")).intValue());
+                    newCode.setAmountOfScans(((Long) hMap.get("amountOfScans")).intValue());
+                    newCode.setLongitude((Double) hMap.get("longitude"));
+                    newCode.setLatitude((Double) hMap.get("latitude"));
+                    qrCodeList.add(newCode);
+                    player.addGameQRCode(newCode);
+                }
+                player.setGameQRCodes(qrCodeList);
+
+                // go to callback
                 myCallBack.onCallBack(context, player);
             }
         });
@@ -181,5 +231,15 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                     qrCodeAdapter.notifyDataSetChanged();
                 }
             }).create().show();
+    }
+
+    /**
+     * Onclick method for when the user accesses their account info (email and phone number)
+     * @param view
+     */
+    public void userQrButtonClicked(View view) {
+        Intent intent = new Intent(PlayerCollectionActivity.this, ShareableQrActivity.class);
+        intent.putExtra(EXTRA_COMMENTS_TYPE, "information");
+        startActivityIfNeeded(intent, 255);
     }
 }

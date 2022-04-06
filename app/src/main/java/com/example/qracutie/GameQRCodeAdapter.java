@@ -67,15 +67,11 @@ public class GameQRCodeAdapter extends ArrayAdapter<GameQRCode> {
 
         // set qr code image
         ImageView qrCodeImage = view.findViewById(R.id.qr_code_list_image);
-        String imageString;
         Glide.with(context).clear(qrCodeImage);
-        if (!qrCodeImages.containsKey(qrCode.getHash())) {
-            Glide.with(context).asBitmap().load(Uri.parse(qrCodeImages.get(qrCode.getHash())))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(qrCodeImage);
+        if (qrCodeImages.containsKey(qrCode.getHash())) {
+            Glide.with(context).asBitmap().load(Uri.parse(qrCodeImages.get(qrCode.getHash()))).into(qrCodeImage);
         } else {
-            qrCodeImage.setImageResource(R.drawable.default_profile_pic);
+            qrCodeImage.setImageResource(R.drawable.default_qrcode_image);
         }
 
         // set qr code points

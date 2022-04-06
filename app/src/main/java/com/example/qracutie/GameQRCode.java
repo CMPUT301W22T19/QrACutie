@@ -70,6 +70,12 @@ public class GameQRCode {
     }
 
     /**
+     * Sets the amount times the QR code has been scanned by all players
+     * @return
+     */
+    public void setAmountOfScans(int count) { this.amountOfScans = count; }
+
+    /**
      * Increments the amount of scans of the QR Code by 1
      */
     public void incrementAmountOfScans() { this.amountOfScans++; }
