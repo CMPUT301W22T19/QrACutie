@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -223,8 +224,24 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                     // remove qr code from screen
                     qrCodeAdapter.remove(qrCode);
                     qrCodeAdapter.notifyDataSetChanged();
+
+                    // save player in database
+                    updatePlayer();
                 }
             }).create().show();
+    }
+
+    /**
+     * Updates a player profile in the databse. This method is to be called
+     * only after deleting a QR code from the player collection
+     */
+    private void updatePlayer(){
+        db.collection("users").document(player.getUsername()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                db.collection("users").document(player.getUsername()).set(player);
+            }
+        });
     }
 
     /**

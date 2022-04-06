@@ -112,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
+
 
         mapButton = (ImageButton) findViewById(R.id.mapButton);
         userAccountButton = (Button) findViewById(R.id.user_account_button);
@@ -247,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
     private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
+        Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
         if (username.equals("")){
