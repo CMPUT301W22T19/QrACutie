@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
     private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
-        Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
         if (username.equals("")){
