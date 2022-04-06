@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
                 // From: tutorialspoint
                 // Url: https://www.tutorialspoint.com/How-to-remove-all-whitespace-from-String-in-Java#:~:text=The%20replaceAll()%20method%20of,replacing%20%22%20%22%20with%20%22%22.
                 // Author: Anjana
-                db.collection("users").document(query.replaceAll(" ","")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                String queryResult = query.replaceAll(" ","");
+                db.collection("users").document(queryResult).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.getResult().exists()){
@@ -143,7 +144,16 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra("searched_username", searched_username);
                             intent.putExtra("searched_highestQR", searched_highestQR);
                             intent.putExtra("searched_total", searched_total);
-                            startActivity(intent);
+                            db.collection("rankings").document("pointTotal").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful() && task.getResult().exists()){
+                                        intent.putExtra("currentRanking", task.getResult().get(queryResult).toString());
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+
                         }else{
                             Toast.makeText(getApplicationContext(), "User does not exist", Toast.LENGTH_SHORT).show();
                         }
