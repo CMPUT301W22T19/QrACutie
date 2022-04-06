@@ -107,11 +107,11 @@ public class SaveQRActivity extends AppCompatActivity {
         String[] qrCodeStringParts = qrCodeString.split(":");
 
         // If qr code is a login qr code, log in player
-        if (qrCodeStringParts[0] == "login") {
+        if (qrCodeStringParts[0].equals("login")) {
             // Change shared preferences user name to username from qr code
             // Launch main activity
             // Pass new login flag through the intent.putExtra()
-            db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if(task.getResult().exists()){
@@ -128,10 +128,10 @@ public class SaveQRActivity extends AppCompatActivity {
             });
         }
         // if qr code is a shareable qr code, launch player info activity
-        else if (qrCodeStringParts[0] == "information") {
+        else if (qrCodeStringParts[0].equals("information")) {
 
             // Check if qrCodeStringParts[1] is a valid player id
-            db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if(task.getResult().exists()){
