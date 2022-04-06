@@ -29,12 +29,13 @@
         <entry key="app/src/main/res/drawable/gradient1.xml" value="0.20925925925925926" />
         <entry key="app/src/main/res/drawable/gradient_drawable.xml" value="0.1421875" />
         <entry key="app/src/main/res/drawable/owner_border.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/account.xml" value="0.16801605605444542" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3092883921754084" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.2226529041157416" />
         <entry key="app/src/main/res/layout/activity_owner_all_players.xml" value="0.22184264152869357" />
         <entry key="app/src/main/res/layout/activity_owner_login.xml" value="0.2490503644063534" />
         <entry key="app/src/main/res/layout/activity_player_collection.xml" value="0.9294361889203344" />
-        <entry key="app/src/main/res/layout/activity_search_player.xml" value="0.3482373172828891" />
+        <entry key="app/src/main/res/layout/activity_search_player.xml" value="0.27578558031169376" />
         <entry key="app/src/main/res/layout/qr_recyclerview_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/recyclerview_list_item.xml" value="0.5067047524739491" />
         <entry key="app/src/main/res/menu/main_menu.xml" value="0.15885416666666666" />
