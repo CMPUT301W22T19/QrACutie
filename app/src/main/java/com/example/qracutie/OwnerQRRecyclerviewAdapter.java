@@ -15,18 +15,31 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-
+/**
+ * Responsible for listing all QR codes of the app, and enabling deletion of these QR codes
+ */
 public class OwnerQRRecyclerviewAdapter extends RecyclerView.Adapter<OwnerQRRecyclerviewAdapter.ViewHolder> {
     private static final String TAG = "OwnerQRRecyclerviewAdapter";
     private ArrayList<String> QRNames = new ArrayList<>();
     private Context context;
     private CollectionReference db = FirebaseFirestore.getInstance().collection("GameQRCodes");
 
+    /**
+     * Setting the arraylist of QR code names
+     * @param QRNames
+     * @param context
+     */
     public OwnerQRRecyclerviewAdapter(ArrayList<String> QRNames, Context context) {
         this.QRNames = QRNames;
         this.context = context;
     }
 
+    /**
+     * Sets the view and viewholder
+     * @param parent
+     * @param viewType
+     * @return viewHolder
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,6 +48,11 @@ public class OwnerQRRecyclerviewAdapter extends RecyclerView.Adapter<OwnerQRRecy
         return viewHolder;
     }
 
+    /**
+     * Controls for displaying as well as the deletion of items
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.textView.setText(QRNames.get(position));
@@ -50,17 +68,23 @@ public class OwnerQRRecyclerviewAdapter extends RecyclerView.Adapter<OwnerQRRecy
         });
     }
 
+    // removes deleted QR code's document from firestore
     private void remFromDat(int pos){
         db.document(QRNames.get(pos)).delete();
     }
 
+    /**
+     * returns the item count
+     * @return the size of QRNames
+     */
     @Override
     public int getItemCount() {
         return QRNames.size();
     }
 
-
-
+    /**
+     * To aid with displaying
+     */
     public class ViewHolder extends RecyclerView.ViewHolder{
         RelativeLayout relativeLayout;
         TextView textView;
