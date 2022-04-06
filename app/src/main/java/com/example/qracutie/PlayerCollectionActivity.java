@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -17,6 +18,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -34,6 +38,12 @@ import java.util.HashMap;
  * who has commented on them, and also who has scanned them.
  */
 public class PlayerCollectionActivity extends AppCompatActivity {
+
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
 
     public static final String EXTRA_COMMENTS_USERNAME = "com.example.qracutie.EXTRA_COMMENTS_USERNAME";
     public static final String EXTRA_COMMENTS_QRCODE = "com.example.qracutie.EXTRA_COMMENTS_QRCODE";
@@ -57,6 +67,20 @@ public class PlayerCollectionActivity extends AppCompatActivity {
 
         // load player from db
         Intent intent = getIntent();
+        String username = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
+
+        // Get current user's username
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        String currentUser = sharedPreferences.getString(TEXT, "");
+
+        // If the user being shown and the current user are not the same, hide the shareable qr code button
+        if (!username.equals(currentUser)) {
+
+            View b = findViewById(R.id.user_qr_button);
+            b.setVisibility(View.GONE);
+        }
+
+
         viewer = intent.getStringExtra(MainActivity.EXTRA_PLAYER_USERNAME);
         personToView = intent.getStringExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME);
 
@@ -207,5 +231,15 @@ public class PlayerCollectionActivity extends AppCompatActivity {
                     qrCodeAdapter.notifyDataSetChanged();
                 }
             }).create().show();
+    }
+
+    /**
+     * Onclick method for when the user accesses their account info (email and phone number)
+     * @param view
+     */
+    public void userQrButtonClicked(View view) {
+        Intent intent = new Intent(PlayerCollectionActivity.this, ShareableQrActivity.class);
+        intent.putExtra(EXTRA_COMMENTS_TYPE, "information");
+        startActivityIfNeeded(intent, 255);
     }
 }

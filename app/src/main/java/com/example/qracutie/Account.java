@@ -24,6 +24,9 @@ import java.util.HashMap;
  * their player profile, such as email and phone number
  */
 public class Account extends AppCompatActivity {
+
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+
     private EditText newEmail;
     private EditText newPhonenumber;
     private Button done;
@@ -71,5 +74,15 @@ public class Account extends AppCompatActivity {
            }
        });
 
+    }
+
+    /**
+     * Onclick method for when the user accesses their account info (email and phone number)
+     * @param view
+     */
+    public void userQrButtonClicked(View view) {
+        Intent intent = new Intent(Account.this, ShareableQrActivity.class);
+        intent.putExtra(EXTRA_COMMENTS_TYPE, "login");
+        startActivityIfNeeded(intent, 255);
     }
 }

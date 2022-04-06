@@ -69,6 +69,9 @@ import java.util.concurrent.ThreadLocalRandom;
  * of all players, sorted according to some specified criteria.
  */
 public class MainActivity extends AppCompatActivity {
+
+    public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";
+
     private Button userAccountButton;
     private TextView nameDisplayed;
     private ImageView profile;
@@ -173,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        userAccountButton = (Button) findViewById(R.id.user_account_button);
+        nameDisplayed = (TextView) findViewById(R.id.display_name);
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override

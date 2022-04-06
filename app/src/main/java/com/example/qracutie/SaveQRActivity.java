@@ -30,6 +30,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -57,6 +63,11 @@ import java.util.function.Consumer;
  * 2. to add an image to their profile associated with the QR code
  */
 public class SaveQRActivity extends AppCompatActivity {
+
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("gameQRCodeImages");
@@ -88,6 +99,43 @@ public class SaveQRActivity extends AppCompatActivity {
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
         scannedQrCode = new GameQRCode(qrCodeHash, points);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT, "");
+
+
+
+        String[] qrCodeStringParts = qrCodeString.split(":");
+
+        // If qr code is a login qr code, log in player
+        if (qrCodeStringParts[0] == "login") {
+
+
+            // Change shared preferences user name to username from qr code
+            // Launch main activity
+            // Pass new login flag through the intent.putExtra()
+        }
+        // if qr code is a shareable qr code, launch player info activity
+        else if (qrCodeStringParts[0] == "information") {
+
+            // Check if qrCodeStringParts[1] is a valid player id
+            db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
+
+                        // call intent
+                        Intent intent = new Intent(SaveQRActivity.this, PlayerCollectionActivity.class);
+                        intent.putExtra("com.example.qracutie.EXTRA_COMMENTS_USERNAME", username);
+                        startActivityIfNeeded(intent, 255);
+
+                    }
+                    else{
+                        // username does not exist, treat like regular qr code
+                    }
+                }
+            });
+        }
+
         if(activity != null && activity.equals("SaveImageActivity")) {
             imageView = findViewById(R.id.save_image_view);
             String imageObject = intent.getStringExtra("player");
