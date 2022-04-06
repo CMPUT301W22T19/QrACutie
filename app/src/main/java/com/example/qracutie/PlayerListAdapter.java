@@ -70,13 +70,10 @@ public class PlayerListAdapter extends ArrayAdapter<Player> {
 
         // set player image
         ImageView playerImage = view.findViewById(R.id.player_list_image);
-        Glide.with(context).clear(playerImage);
-        if (!player.getProfileImage().equals("")) {
-            Glide.with(context).asBitmap().load(Uri.parse(player.getProfileImage()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE) // Remove this to achieve faster image loading, but less accurate
-                    .skipMemoryCache(true) // Remove this to achieve faster image loading, but less accurate
-                    .into(playerImage);
-        } else {
+        if(!player.getProfileImage().equals("")){
+            Glide.with(context.getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(playerImage);
+        }else{
+            Glide.with(context.getApplicationContext()).clear(playerImage);
             playerImage.setImageResource(R.drawable.default_profile_pic);
         }
 

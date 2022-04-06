@@ -28,7 +28,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -58,6 +65,11 @@ import java.util.function.Consumer;
  */
 public class SaveQRActivity extends AppCompatActivity {
 
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String TEXT = "username";
+
+    private String username = "";
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("gameQRCodeImages");
     private static final int REQUEST_LOCATION_PERMISSION = 1;
@@ -69,6 +81,7 @@ public class SaveQRActivity extends AppCompatActivity {
     double scannedLongitude;
     Boolean boxChecked = false;
     ImageView imageView;
+    TextView pointsView;
     Bitmap capturedImage;
     String qrCodeString;
     StorageReference storageRef;
@@ -87,18 +100,64 @@ public class SaveQRActivity extends AppCompatActivity {
         qrCodeString = intent.getStringExtra("qrcode");
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
+        pointsView = (TextView) findViewById(R.id.points);
+        pointsView.setText("QR Code Points: " + points);
         scannedQrCode = new GameQRCode(qrCodeHash, points);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT, "");
+
+
+
+        String[] qrCodeStringParts = qrCodeString.split(":");
+
+        // If qr code is a login qr code, log in player
+        if (qrCodeStringParts[0].equals("login")) {
+            // Change shared preferences user name to username from qr code
+            // Launch main activity
+            // Pass new login flag through the intent.putExtra()
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
+                        Intent intent = new Intent(SaveQRActivity.this, MainActivity.class);
+                        intent.putExtra( "activity", "SaveQRActivity");
+                        intent.putExtra("action", "userLoggingIn");
+                        intent.putExtra("username", qrCodeStringParts[1]);
+                        startActivity(intent);
+                    }
+                }
+            });
+        }
+        // if qr code is a shareable qr code, launch player info activity
+        else if (qrCodeStringParts[0].equals("information")) {
+
+            // Check if qrCodeStringParts[1] is a valid player id
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
+                        // call intent
+                        Intent intent = new Intent(SaveQRActivity.this, PlayerCollectionActivity.class);
+                        intent.putExtra(MainActivity.EXTRA_PLAYER_USERNAME, username);
+                        intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME, qrCodeStringParts[1]);
+                        startActivityIfNeeded(intent, 255);
+
+                    }
+                    else{
+                        // username does not exist, treat like regular qr code
+                    }
+                }
+            });
+        }
+
         if(activity != null && activity.equals("SaveImageActivity")) {
             imageView = findViewById(R.id.save_image_view);
             String imageObject = intent.getStringExtra("player");
             capturedImage = (Bitmap) intent.getParcelableExtra("image");
             imageView.setImageBitmap(capturedImage);
-            Toast.makeText(getApplicationContext(), activity, Toast.LENGTH_SHORT).show();
             storageRef = FirebaseStorage.getInstance().getReference("gameQRcodeImages/"+player.getUsername());
             imageQRRef = storageRef.child(qrCodeHash);
         }
-
-        Toast.makeText(getApplicationContext(), player.getUsername(), Toast.LENGTH_SHORT).show();
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         // This part asks for location access permission from the user
@@ -175,7 +234,6 @@ public class SaveQRActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 db.collection("users").document(player.getUsername()).set(player);
-                Toast.makeText(getApplicationContext(), "SAVING: " + (player.getGameQRCodes().size()), Toast.LENGTH_SHORT).show();
             }
         });
         goToMain();
@@ -194,16 +252,12 @@ public class SaveQRActivity extends AppCompatActivity {
                         scannedQrCode.setLatitude(scannedLatitude);
                     }
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
-                    Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
-                    Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     beginImageUpload();
 
                 }else{
                     db.collection("GameQRCodes").document(scannedQrCode.getHash()).set(scannedQrCode);
-                    Toast.makeText(getApplicationContext(), "BEFORE: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     player.addGameQRCode(scannedQrCode);
-                    Toast.makeText(getApplicationContext(), "AFTER: " + (Integer.toString(player.getGameQRCodes().size())), Toast.LENGTH_SHORT).show();
                     beginImageUpload();
                 }
             }
@@ -217,9 +271,7 @@ public class SaveQRActivity extends AppCompatActivity {
         imageQRRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 player.addImage(scannedQrCode.getHash(), uri.toString());
-                Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 updatePlayer();
             }
         });
@@ -249,7 +301,6 @@ public class SaveQRActivity extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
                 // ...
-                Toast.makeText(getApplicationContext(), "SavedTODB", Toast.LENGTH_SHORT).show();
                 addImageUri();
             }
         });
@@ -262,9 +313,7 @@ public class SaveQRActivity extends AppCompatActivity {
         imageQRRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Toast.makeText(getApplicationContext(), "BEFORE IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 player.addImage(scannedQrCode.getHash(), uri.toString());
-                Toast.makeText(getApplicationContext(), "AFTER IMAGES: " + player.getGameQRCodeImages().size(), Toast.LENGTH_SHORT).show();
                 updatePlayer();
             }
         });

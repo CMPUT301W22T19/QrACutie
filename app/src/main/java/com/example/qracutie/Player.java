@@ -16,7 +16,6 @@ public class Player {
     String email = "";
     String phoneNumber = "";
     String profileImage = "";
-    Bitmap profilePic; // profile picture of user
 
     ArrayList<GameQRCode> gameQRCodes = new ArrayList<>(); // all qrCodes belonging to the player
     int highestQRCode = 0; // highest pointed QR code belonging to the player
@@ -101,22 +100,6 @@ public class Player {
      */
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
-    }
-
-    /**
-     * returns profile picture associated with player
-     * @return Bitmap
-     */
-    public Bitmap getProfilePic() {
-        return profilePic;
-    }
-
-    /**
-     * updates profile picture associated with player
-     * @param profilePic
-     */
-    public void setProfilePic(Bitmap profilePic){
-        this.profilePic = profilePic;
     }
 
     /**
