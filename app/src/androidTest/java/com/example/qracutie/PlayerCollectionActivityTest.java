@@ -1,7 +1,6 @@
 package com.example.qracutie;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -109,6 +109,22 @@ public class PlayerCollectionActivityTest {
         // check value of lowest points
         TextView lowestScore = (TextView) solo.getView(R.id.collection_lowest_score_val);
         assertEquals("10", lowestScore.getText());
+    }
+
+    /**
+     * checks if activity correctly switches when the camera button is pressed
+     */
+    @Test
+    public void checkShareableQrActivitySwitch(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", PlayerCollectionActivity.class);
+
+        // click the camera button
+        Button button = (Button) solo.getView(R.id.user_qr_button);
+        solo.clickOnView(button);
+
+        // Asserts that the current activity switched to CameraActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", ShareableQrActivity.class);
     }
 
     @After
