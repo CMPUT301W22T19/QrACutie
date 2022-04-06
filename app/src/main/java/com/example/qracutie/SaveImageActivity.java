@@ -36,6 +36,10 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * The SaveImageActivity allows a user to attach an image, using the default built in camera,
+ * to some QR code that has just been scanned. A copy of the image is then stored by the user.
+ */
 public class SaveImageActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     ActivityResultLauncher<Intent> activityResultLauncher;

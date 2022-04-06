@@ -18,8 +18,12 @@ import com.google.zxing.WriterException;
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 
-
-// https://www.geeksforgeeks.org/how-to-generate-qr-code-in-android/
+/**
+ * The shareable QR Activity generates and displays a QR code which encodes a special string,
+ * meant to communicate with other users either one's game status, or one's player profile.
+ *
+ * https://www.geeksforgeeks.org/how-to-generate-qr-code-in-android/
+ */
 public class ShareableQrActivity extends AppCompatActivity {
 
     public static final String EXTRA_COMMENTS_TYPE = "com.example.qracutie.EXTRA_COMMENTS_TYPE";

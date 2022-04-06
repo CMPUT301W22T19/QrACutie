@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 
+/**
+ * The SearchPlayer activity displays information for a player that has just been
+ * searched by the user on the homepage.
+ */
 public class SearchPlayer extends AppCompatActivity {
     private ImageView image;
     private TextView username;

@@ -2,6 +2,11 @@ package com.example.qracutie;
 
 import android.graphics.Bitmap;
 
+/**
+ * The nearby QR code represents a QR code on the map which can be seen within the user's
+ * searchable radius. Unlike the gamQRCode, the nearby QR code has a relative distance
+ * rather than a longitude and latitude
+ */
 public class NearbyQRCode {
     private int points;
     private String hash;
