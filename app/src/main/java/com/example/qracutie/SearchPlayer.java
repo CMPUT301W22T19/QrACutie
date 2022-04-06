@@ -11,11 +11,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 
+/**
+ * The SearchPlayer activity displays information for a player that has just been
+ * searched by the user on the homepage.
+ */
 public class SearchPlayer extends AppCompatActivity {
     private ImageView image;
     private TextView username;
     private TextView highestQR;
     private TextView total;
+    private TextView currRank;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +30,7 @@ public class SearchPlayer extends AppCompatActivity {
         username = (TextView) findViewById(R.id.search_username);
         highestQR = (TextView) findViewById(R.id.search_highestQR);
         total = (TextView) findViewById(R.id.search_totalQRs);
+        currRank = (TextView) findViewById(R.id.search_ranking);
 
         Intent intent = getIntent();
         if(!intent.getStringExtra("searched_image").equals("")){
@@ -36,5 +42,6 @@ public class SearchPlayer extends AppCompatActivity {
         username.setText(intent.getStringExtra("searched_username"));
         highestQR.setText(intent.getStringExtra("searched_highestQR"));
         total.setText(intent.getStringExtra("searched_total"));
+        currRank.setText(intent.getStringExtra("currentRanking"));
     }
 }

@@ -36,6 +36,11 @@ public class Account extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Retrieves the necessary account info to be displayed to the screen
+     * Has the onclick methods for the login QR code
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -54,6 +59,9 @@ public class Account extends AppCompatActivity {
                 String oldEmail = task.getResult().get("email").toString();
                 newEmail.setText(oldEmail);
                 String oldNumber = task.getResult().get("phoneNumber").toString();
+                if (oldNumber.equals("") && task.getResult().get("phonenumber") != null) {
+                    oldNumber = task.getResult().get("phonenumber").toString();
+                }
                 newPhonenumber.setText(oldNumber);
             }
         });

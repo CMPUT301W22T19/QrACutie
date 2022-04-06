@@ -18,7 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
-
+/**
+ * Responsible for listing all players of the app, and enabling deletion of these players
+ */
 public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecyclerviewAdapter.ViewHolder>{
     private static final String TAG = "OwnerRecyclerviewAdapter";
     private ArrayList<String> playerNames = new ArrayList<>();
@@ -30,6 +32,14 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("profileImages");
     private CollectionReference db = FirebaseFirestore.getInstance().collection("users");
 
+    /**
+     * Sets the relevant player's name
+     * Populates the list of all player's names, as well as their images in arraylists
+     * @param username
+     * @param playerNames
+     * @param playerImages
+     * @param context
+     */
     public OwnerRecyclerviewAdapter(String username,ArrayList<String> playerNames, ArrayList<String> playerImages, Context context) {
         this.username = username;
         this.playerNames = playerNames;
@@ -37,6 +47,12 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
         this.context = context;
     }
 
+    /**
+     * Sets the view and viewholder
+     * @param parent
+     * @param viewType
+     * @return viewHolder
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,6 +61,11 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
         return viewHolder;
     }
 
+    /**
+     * Controls for displaying as well as the deletion of items
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if(!playerImages.get(position).equals("default image")) {
@@ -71,20 +92,33 @@ public class OwnerRecyclerviewAdapter extends RecyclerView.Adapter<OwnerRecycler
         });
     }
 
+    /**
+     * controls for if the owner deletes their own player account
+     * @return the boolean ownerDeletedSelf
+     */
     public Boolean getOwnerDeletedSelf(){
         return ownerDeletedSelf;
     }
+
+    // removes deleted QR code's document from firestore
     private void remFromDat(int pos){
         storageReference.child(playerNames.get(pos)+".jpeg").delete();
         db.document(playerNames.get(pos)).delete();
 
     }
 
+    /**
+     * returns the item count
+     * @return the size of playerNames
+     */
     @Override
     public int getItemCount() {
         return playerNames.size();
     }
 
+    /**
+     * To aid with displaying
+     */
     public class ViewHolder extends RecyclerView.ViewHolder{
         ImageView playerImage;
         TextView playerName;
