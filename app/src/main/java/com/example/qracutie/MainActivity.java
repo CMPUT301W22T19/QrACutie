@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
     private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
-        Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
         if (username.equals("")){
@@ -270,9 +270,6 @@ public class MainActivity extends AppCompatActivity {
             doesPlayerExist();
         }else if(prevActivity != null && prevActivity.equals("SaveQRActivity") && intent.getStringExtra("action").equals("userLoggingIn")){
             username = intent.getStringExtra("username");
-
-            Toast.makeText(getApplicationContext(), "SABA:"+username, Toast.LENGTH_SHORT).show();
-
 
             SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
