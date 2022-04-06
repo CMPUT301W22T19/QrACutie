@@ -108,11 +108,24 @@ public class SaveQRActivity extends AppCompatActivity {
 
         // If qr code is a login qr code, log in player
         if (qrCodeStringParts[0] == "login") {
-
-
             // Change shared preferences user name to username from qr code
             // Launch main activity
             // Pass new login flag through the intent.putExtra()
+            db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
+                        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(TEXT, qrCodeStringParts[1]);
+                        editor.apply();
+                        Intent intent = new Intent(SaveQRActivity.this, MainActivity.class);
+                        intent.putExtra( "activity", "SaveQRActivity");
+                        intent.putExtra("action", "userLoggingIn");
+                        startActivity(intent);
+                    }
+                }
+            });
         }
         // if qr code is a shareable qr code, launch player info activity
         else if (qrCodeStringParts[0] == "information") {

@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
         if (username.equals("")){
             generateUniqueUsername();
         }else{
-            clearPlayerFromStorage();
             doesDocExist();
         }
     }
@@ -281,10 +280,12 @@ public class MainActivity extends AppCompatActivity {
         String prevActivity = intent.getStringExtra("activity");
         if(prevActivity != null && prevActivity.equals("ownerspage") && intent.getBooleanExtra("ownerDeletedSelf",false) == true){
             clearPlayerFromStorage();
+            doesPlayerExist();
+        }else if(prevActivity != null && prevActivity.equals("SaveQRCode") && intent.getStringExtra("action").equals("userLoggingIn")){
+            playerExistence();
+        }else{
+            doesPlayerExist();
         }
-        // coming from saveqractivity specfically changed user
-        //playerExistence();
-        doesPlayerExist();
     }
 
     private void clearPlayerFromStorage() {
@@ -459,6 +460,7 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Glide.with(getApplicationContext()).clear(profile);
                     profile.setImageResource(R.drawable.default_profile_pic);
+                    clearPlayerFromStorage();
                     generateUniqueUsername();
                 }
             }
