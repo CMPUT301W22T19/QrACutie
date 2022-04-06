@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -72,6 +73,17 @@ public class MainActivityTest {
 
         // Asserts that the current activity switched to AccountActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", PlayerCollectionActivity.class);
+    }
+
+    @Test
+    public void checkSearchBar(){
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+        androidx.appcompat.widget.SearchView searchBar = (androidx.appcompat.widget.SearchView) solo.getView(R.id.searchView);
+        searchBar.setQuery("userTest", true);
+
+        // Asserts that the current activity switched to AccountActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", SearchPlayer.class);
     }
 
     /**
