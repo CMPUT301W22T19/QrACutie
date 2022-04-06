@@ -282,6 +282,11 @@ public class MainActivity extends AppCompatActivity {
             clearPlayerFromStorage();
             doesPlayerExist();
         }else if(prevActivity != null && prevActivity.equals("SaveQRCode") && intent.getStringExtra("action").equals("userLoggingIn")){
+            username = intent.getStringExtra("username");
+            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(TEXT, username);
+            editor.apply();
             playerExistence();
         }else{
             doesPlayerExist();
