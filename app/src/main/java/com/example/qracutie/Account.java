@@ -36,6 +36,11 @@ public class Account extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Retrieves the necessary account info to be displayed to the screen
+     * Has the onclick methods for the login QR code
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
