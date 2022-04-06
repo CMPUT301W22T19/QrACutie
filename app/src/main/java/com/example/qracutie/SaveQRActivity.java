@@ -111,25 +111,35 @@ public class SaveQRActivity extends AppCompatActivity {
         String[] qrCodeStringParts = qrCodeString.split(":");
 
         // If qr code is a login qr code, log in player
-        if (qrCodeStringParts[0] == "login") {
-
-
+        if (qrCodeStringParts[0].equals("login")) {
             // Change shared preferences user name to username from qr code
             // Launch main activity
             // Pass new login flag through the intent.putExtra()
-        }
-        // if qr code is a shareable qr code, launch player info activity
-        else if (qrCodeStringParts[0] == "information") {
-
-            // Check if qrCodeStringParts[1] is a valid player id
-            db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if(task.getResult().exists()){
+                        Intent intent = new Intent(SaveQRActivity.this, MainActivity.class);
+                        intent.putExtra( "activity", "SaveQRActivity");
+                        intent.putExtra("action", "userLoggingIn");
+                        intent.putExtra("username", qrCodeStringParts[1]);
+                        startActivity(intent);
+                    }
+                }
+            });
+        }
+        // if qr code is a shareable qr code, launch player info activity
+        else if (qrCodeStringParts[0].equals("information")) {
 
+            // Check if qrCodeStringParts[1] is a valid player id
+            db.collection("users").document(qrCodeStringParts[1]).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
                         // call intent
                         Intent intent = new Intent(SaveQRActivity.this, PlayerCollectionActivity.class);
-                        intent.putExtra("com.example.qracutie.EXTRA_COMMENTS_USERNAME", username);
+                        intent.putExtra(MainActivity.EXTRA_PLAYER_USERNAME, username);
+                        intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME, qrCodeStringParts[1]);
                         startActivityIfNeeded(intent, 255);
 
                     }

@@ -1,5 +1,23 @@
 package com.example.qracutie;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -9,53 +27,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.SearchView;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
-import android.widget.Button;
-import android.os.Environment;
-
-import android.provider.MediaStore;
-
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -126,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //SharedPreferences sharedPreferences  = getApplicationContext().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         //sharedPreferences.edit().clear().commit();
+
 
         mapButton = (ImageButton) findViewById(R.id.mapButton);
         userAccountButton = (Button) findViewById(R.id.user_account_button);
@@ -248,12 +236,22 @@ public class MainActivity extends AppCompatActivity {
         updateLeaders("pointTotal", 10); // replaces empty leader board
     }
 
+    private void doesPlayerExist(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        username = sharedPreferences.getString(TEXT,"");
+        if (username.equals("")){
+            generateUniqueUsername();
+        }else{
+            doesDocExist();
+        }
+    }
+
     private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
+        Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
-        // or owner deleted their own player profile
         if (username.equals("")){
             generateUniqueUsername();
         }else{
@@ -269,8 +267,21 @@ public class MainActivity extends AppCompatActivity {
         String prevActivity = intent.getStringExtra("activity");
         if(prevActivity != null && prevActivity.equals("ownerspage") && intent.getBooleanExtra("ownerDeletedSelf",false) == true){
             clearPlayerFromStorage();
+            doesPlayerExist();
+        }else if(prevActivity != null && prevActivity.equals("SaveQRActivity") && intent.getStringExtra("action").equals("userLoggingIn")){
+            username = intent.getStringExtra("username");
+
+            Toast.makeText(getApplicationContext(), "SABA:"+username, Toast.LENGTH_SHORT).show();
+
+
+            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(TEXT, username);
+            editor.apply();
+            playerExistence();
+        }else{
+            doesPlayerExist();
         }
-        playerExistence();
     }
 
     private void clearPlayerFromStorage() {
@@ -386,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.getResult().exists()){
+                if(task.isSuccessful() && task.getResult().exists()){
                     // this is a duplicated username
                     generateUniqueUsername();
                 }else{
@@ -429,13 +440,30 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(called.equals("account")){
                     db.collection("users").document(username).update("email", player.getEmail());
-                    db.collection("users").document(username).update("phoneNumber", player.getPhoneNumber());
+                    db.collection("users").document(username).update("phonenumber", player.getPhoneNumber());
                 }else{
                     db.collection("users").document(username).update("profileImage", player.getProfileImage());
                 }
             }
         });
     }
+
+    private void doesDocExist() {
+        db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                }else{
+                    Glide.with(getApplicationContext()).clear(profile);
+                    profile.setImageResource(R.drawable.default_profile_pic);
+                    clearPlayerFromStorage();
+                    generateUniqueUsername();
+                }
+            }
+        });
+    }
+
+
 
     /**
      * Retrieves the info of an existing player from the database
@@ -444,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.getResult().exists()){
+                if(task.isSuccessful() && task.getResult().exists()){
                     player = new Player(username);
                     ArrayList<GameQRCode> orig_gameQrCodes = (ArrayList<GameQRCode>) task.getResult().get("gameQRCodes");
                     HashMap<String, String> orig_gameQRCodeImages = (HashMap<String, String>) task.getResult().get("gameQRCodeImages");
@@ -460,13 +488,15 @@ public class MainActivity extends AppCompatActivity {
                     player.setEmail(orig_email);
                     player.setPhoneNumber(orig_phonenumber);
                     player.setProfileImage(orig_profile_image);
-                    Glide.with(getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(profile);
+                    if(!player.getProfileImage().equals("")){
+                        Glide.with(getApplicationContext()).asBitmap().load(Uri.parse(player.getProfileImage())).into(profile);
+                    }else{
+                        Glide.with(getApplicationContext()).clear(profile);
+                        profile.setImageResource(R.drawable.default_profile_pic);
+                    }
                     nameDisplayed.setText(username);
                     isPlayerSet = true;
                 }else{
-                    // user is in shared preferences not in the database, meaning they no longer exist
-                    // because the owner has deleted them
-                    clearPlayerFromStorage();
                     generateUniqueUsername();
                     isPlayerSet = true;
                 }
