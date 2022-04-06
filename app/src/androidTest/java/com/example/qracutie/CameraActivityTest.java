@@ -3,6 +3,7 @@ package com.example.qracutie;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.gson.Gson;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -23,8 +25,14 @@ public class CameraActivityTest {
 
     @Rule
     public ActivityTestRule<CameraActivity> rule =
-            new ActivityTestRule<>(CameraActivity.class, true, true);
-
+            new ActivityTestRule(CameraActivity.class, true, true){
+                @Override
+                protected Intent getActivityIntent (){
+                    Intent intent = new Intent();
+                    intent.putExtra("username", "userTest");
+                    return intent;
+                }
+            };
 
     @Before
     public void setUp() throws Exception {
@@ -50,7 +58,7 @@ public class CameraActivityTest {
         solo.clickOnView(button);
 
         // Asserts that the current activity switched to SAVEQR Activity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", SaveQRActivity.class);
+        solo.assertCurrentActivity("Wrong Activity", SaveImageActivity.class);
     }
 
 

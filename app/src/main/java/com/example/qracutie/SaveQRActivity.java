@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -80,6 +81,7 @@ public class SaveQRActivity extends AppCompatActivity {
     double scannedLongitude;
     Boolean boxChecked = false;
     ImageView imageView;
+    TextView pointsView;
     Bitmap capturedImage;
     String qrCodeString;
     StorageReference storageRef;
@@ -98,6 +100,8 @@ public class SaveQRActivity extends AppCompatActivity {
         qrCodeString = intent.getStringExtra("qrcode");
         String qrCodeHash = shaHash(qrCodeString);
         int points = computeHashScore(qrCodeHash);
+        pointsView = (TextView) findViewById(R.id.points);
+        pointsView.setText("QR Code Points: " + points);
         scannedQrCode = new GameQRCode(qrCodeHash, points);
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT, "");
