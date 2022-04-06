@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -125,22 +124,6 @@ public class PlayerCollectionActivityTest {
 
         // Check that the more options fragment appears
         assertTrue(solo.waitForText("Would you like to delete this QR Code?", 1, 2000));
-    }
-
-    /**
-     * checks if activity correctly switches when the camera button is pressed
-     */
-    @Test
-    public void checkShareableQrActivitySwitch(){
-        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", PlayerCollectionActivity.class);
-
-        // click the camera button
-        Button button = (Button) solo.getView(R.id.user_qr_button);
-        solo.clickOnView(button);
-
-        // Asserts that the current activity switched to CameraActivity. Otherwise, show “Wrong Activity”
-        solo.assertCurrentActivity("Wrong Activity", ShareableQrActivity.class);
     }
 
     @After
