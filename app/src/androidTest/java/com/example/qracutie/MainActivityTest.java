@@ -7,11 +7,14 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
+
+import com.google.android.material.tabs.TabItem;
 import com.robotium.solo.Solo;
 
 import org.junit.After;
@@ -140,6 +143,23 @@ public class MainActivityTest {
 
         // Asserts that the current activity switched to CameraActivity. Otherwise, show “Wrong Activity”
         solo.assertCurrentActivity("Wrong Activity", CameraActivity.class);
+    }
+
+    /**
+     * checks leaderboard player can be selected to see full collection
+     */
+    @Test
+    public void checkLeaderboardClick() {
+        // Asserts that the current activity is the MainActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", MainActivity.class);
+
+        // select a leader from the leaderboard
+        assertTrue(solo.waitForText("#1", 1, 2000));
+        ListView leaderboard = (ListView) solo.getView(R.id.leaderboard);
+        solo.clickOnView(leaderboard.getChildAt(0));
+
+        // Asserts that the current activity switched to PlayerCollectionActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", PlayerCollectionActivity.class);
     }
 
     @After

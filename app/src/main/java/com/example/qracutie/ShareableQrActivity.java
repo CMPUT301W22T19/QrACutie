@@ -18,13 +18,10 @@ import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
 
 /**
- * Class to model a Shareable QR Code Display Page
+ * The shareable QR Activity generates and displays a QR code which encodes a special string,
+ * meant to communicate with other users either one's game status, or one's player profile.
  *
- * When opened, the class generates a qr code that can be shared with other app user. The two types
- * of qr codees are login: and information: and are passed with the intent when the activity
- * is opened
- *
- * Adapted in large parts from https://www.geeksforgeeks.org/how-to-generate-qr-code-in-android/
+ * https://www.geeksforgeeks.org/how-to-generate-qr-code-in-android/
  */
 public class ShareableQrActivity extends AppCompatActivity {
 

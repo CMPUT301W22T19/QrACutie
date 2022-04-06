@@ -18,6 +18,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * The page where the owner logs in
+ * The owner's login information is authenticated via firebase
+ * The owner can either login or
+ * reset their password via email
+ */
 public class OwnerLogin extends AppCompatActivity {
     private Button log_in_clicked;
     private Button reset_password;
@@ -27,6 +33,11 @@ public class OwnerLogin extends AppCompatActivity {
     private EditText password;
     private String emailstr = "";
     private String passwordstr = "";
+
+    /**
+     * Lisen for owner logging in or resetting their password
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -87,12 +98,19 @@ public class OwnerLogin extends AppCompatActivity {
         });
     }
 
+
+    // redirects to the page where the owner can actively manage players and QR codes, upon successfully signing in
     private void gotToOwnersPage(){
         Intent intent = new Intent(this, OwnerAllPlayers.class);
         intent.putExtra("username", username);
         startActivity(intent);
     }
 
+    /**
+     * This is the back button that redirects to main
+     * @param item
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){

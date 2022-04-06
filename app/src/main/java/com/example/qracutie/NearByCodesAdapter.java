@@ -22,6 +22,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The nearby codes adabter allows NearbyQR Codes to be added to an array adapter for
+ * display in a listview element within the maps activity.
+ */
 public class NearByCodesAdapter extends ArrayAdapter<NearbyQRCode> {
     private ArrayList<NearbyQRCode> qrCodes;
     private Context context;

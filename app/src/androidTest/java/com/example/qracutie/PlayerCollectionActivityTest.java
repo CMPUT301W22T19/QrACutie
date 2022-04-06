@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,8 +33,8 @@ public class PlayerCollectionActivityTest {
                 @Override
                 protected Intent getActivityIntent (){
                     Intent intent = new Intent();
-                    intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME,"user042580");
-                    intent.putExtra(MainActivity.EXTRA_PLAYER_USERNAME, "user042580");
+                    intent.putExtra(MainActivity.EXTRA_PLAYER_COLLECTION_USERNAME,"user864321");
+                    intent.putExtra(MainActivity.EXTRA_PLAYER_USERNAME, "user864321");
                     return intent;
                 }
             };
@@ -60,13 +61,10 @@ public class PlayerCollectionActivityTest {
         ListView qrCodeList = (ListView) solo.getView(R.id.qr_code_list);
 
         GameQRCode qrCode1 = (GameQRCode) qrCodeList.getItemAtPosition(0);
-        assertEquals(20, qrCode1.getPoints());
+        assertEquals(34, qrCode1.getPoints());
 
         GameQRCode qrCode2 = (GameQRCode) qrCodeList.getItemAtPosition(1);
-        assertEquals(50, qrCode2.getPoints());
-
-        GameQRCode qrCode3 = (GameQRCode) qrCodeList.getItemAtPosition(2);
-        assertEquals(10, qrCode3.getPoints());
+        assertEquals(42, qrCode2.getPoints());
     }
 
     /**
@@ -96,19 +94,37 @@ public class PlayerCollectionActivityTest {
 
         // check value of total points
         TextView totalPoints = (TextView) solo.getView(R.id.collection_total_points_val);
-        assertEquals("80", totalPoints.getText());
+        assertEquals("76", totalPoints.getText());
 
         // check value for total codes
         TextView totalCodes = (TextView) solo.getView(R.id.collection_total_codes_val);
-        assertEquals("3", totalCodes.getText());
+        assertEquals("2", totalCodes.getText());
 
         // check value of highest points
         TextView highestScore = (TextView) solo.getView(R.id.collection_highest_score_val);
-        assertEquals("50", highestScore.getText());
+        assertEquals("42", highestScore.getText());
 
         // check value of lowest points
         TextView lowestScore = (TextView) solo.getView(R.id.collection_lowest_score_val);
-        assertEquals("10", lowestScore.getText());
+        assertEquals("34", lowestScore.getText());
+    }
+
+    /**
+     * checks if the options button on the QR code pops out a window that lets the code be deleted
+     */
+    @Test
+    public void checkDeleteQRCode() {
+        // Asserts that the current activity is PlayerCollectionActivity. Otherwise, show “Wrong Activity”
+        solo.assertCurrentActivity("Wrong Activity", PlayerCollectionActivity.class);
+
+        // select the more options button on a QR code from the list
+        assertTrue(solo.waitForText("Points", 1, 2000));
+        ListView qrCodeList = (ListView) solo.getView(R.id.qr_code_list);
+        View view = qrCodeList.getChildAt(0);
+        solo.clickOnView(view.findViewById(R.id.options_button));
+
+        // Check that the more options fragment appears
+        assertTrue(solo.waitForText("Would you like to delete this QR Code?", 1, 2000));
     }
 
     /**

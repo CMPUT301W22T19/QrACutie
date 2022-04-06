@@ -90,7 +90,6 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getApplicationContext(), qrCode, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(), SaveQRActivity.class);
                 intent.putExtra("player", (new Gson()).toJson(player));
                 intent.putExtra("qrcode", qrCode);

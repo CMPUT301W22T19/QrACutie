@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
                 // From: tutorialspoint
                 // Url: https://www.tutorialspoint.com/How-to-remove-all-whitespace-from-String-in-Java#:~:text=The%20replaceAll()%20method%20of,replacing%20%22%20%22%20with%20%22%22.
                 // Author: Anjana
-                db.collection("users").document(query.replaceAll(" ","")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                String queryResult = query.replaceAll(" ","");
+                db.collection("users").document(queryResult).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.getResult().exists()){
@@ -143,7 +144,16 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra("searched_username", searched_username);
                             intent.putExtra("searched_highestQR", searched_highestQR);
                             intent.putExtra("searched_total", searched_total);
-                            startActivity(intent);
+                            db.collection("rankings").document("pointTotal").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful() && task.getResult().exists()){
+                                        intent.putExtra("currentRanking", task.getResult().get(queryResult).toString());
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+
                         }else{
                             Toast.makeText(getApplicationContext(), "User does not exist", Toast.LENGTH_SHORT).show();
                         }
@@ -236,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         updateLeaders("pointTotal", 10); // replaces empty leader board
     }
 
+    // Checks if the player's document is in the database, does not invlove grabbing player info
     private void doesPlayerExist(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
@@ -246,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Checks if the player's document is in the database, this is for grabbing the player info as well
     private void playerExistence(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         username = sharedPreferences.getString(TEXT,"");
-        Toast.makeText(getApplicationContext(), username, Toast.LENGTH_SHORT).show();
         // if username isn't stored in shared preferences, then generate a username
         // someone is opening our app for the first time
         if (username.equals("")){
@@ -260,6 +271,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * We check if the player exists, in case the owner has deleted them at any point
+     * or if the player has changed due to loggin in with a qr code from the saveQRActivity
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -270,10 +285,6 @@ public class MainActivity extends AppCompatActivity {
             doesPlayerExist();
         }else if(prevActivity != null && prevActivity.equals("SaveQRActivity") && intent.getStringExtra("action").equals("userLoggingIn")){
             username = intent.getStringExtra("username");
-
-            Toast.makeText(getApplicationContext(), "SABA:"+username, Toast.LENGTH_SHORT).show();
-
-
             SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(TEXT, username);
@@ -284,10 +295,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    // Clears the players gameQRCodes from storage
+    // This method is specifically for if the owner has deleted the player, so we no longer want their records in storage
     private void clearPlayerFromStorage() {
         FirebaseStorage.getInstance().getReference().child("gameQRcodeImages").child(username).delete();
     }
 
+    /**
+     * This method is for displaying the owner button
+     * @param menu
+     * @return true
+     */
     @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -302,6 +321,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * managed the activity we are redirected to by clicking the owner button
+     * @param item
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.owner_login_button){
@@ -326,19 +350,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /**
-     * Draws the player's profile image
-     */
+    // Draws the player's profile image
     private Bitmap draw_profile_image(Uri uri) throws IOException {
         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
         profile.setImageBitmap(bitmap);
         return bitmap;
     }
 
-    /**
-     * Begins the process of uploading the player's profile image to firebase storage
-     * @param bitmap
-     */
+
+    // Begins the process of uploading the player's profile image to firebase storage
     private void uploadProfileImage(Bitmap bitmap){
         // From: Youtube
         // URL: https://www.youtube.com/watch?v=CDv05EP45JQ&ab_channel=yoursTRULY
@@ -354,10 +374,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Retrieves the player's profile image from Firebase storage
-     * @param storageReference
-     */
+    // Retrieves the player's profile image from Firebase storage
     private void getProfileImageUri(StorageReference storageReference){
         storageReference.child(username+".jpeg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -367,9 +384,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * For the player to choose an image from their photo gallery
-     */
+    // For the player to choose an image from their photo gallery
     private void getProfileFromGallery(){
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         String picturesPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath();
@@ -377,10 +392,7 @@ public class MainActivity extends AppCompatActivity {
         activityResultLauncher.launch(intent);
     }
 
-
-    /**
-     * Generates a unique username for a new player
-     */
+    // Generates a unique username for a new player
     private void generateUniqueUsername(){
         username = "user";
         for(int i = 0; i < 6; i++){
@@ -390,9 +402,7 @@ public class MainActivity extends AppCompatActivity {
         isUniqueCheck();
     }
 
-    /**
-     * Checking if the player's generated name is unique
-     */
+    // Checking if the player's generated name is unique
     private void isUniqueCheck(){
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -409,9 +419,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Creates the player in Firebase
-     */
+
+    // Creates the player in Firebase
     private void createNewUser(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -440,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(called.equals("account")){
                     db.collection("users").document(username).update("email", player.getEmail());
-                    db.collection("users").document(username).update("phonenumber", player.getPhoneNumber());
+                    db.collection("users").document(username).update("phoneNumber", player.getPhoneNumber());
                 }else{
                     db.collection("users").document(username).update("profileImage", player.getProfileImage());
                 }
@@ -448,6 +457,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // checks if the document exists in the database without using glide in the if statement which would slow down displaying of images
     private void doesDocExist() {
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -465,9 +475,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    /**
-     * Retrieves the info of an existing player from the database
-     */
+
+    // Retrieves the info of an existing player from the database
     private void getPlayerInfo(){
         db.collection("users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -504,9 +513,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Retrieves a set amount of users at the top of some type of leaderboard
-     */
+
+    // Retrieves a set amount of users at the top of some type of leaderboard
     private void updateLeaders(String type, int limit){
 
         // clear player collection
@@ -563,10 +571,9 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Retrieves a rank for the user based on firebase ranking map. Updates firebase rankings
-     * if no update has occurred within the past hour
-     */
+
+    // Retrieves a rank for the user based on firebase ranking map. Updates firebase rankings
+    // if no update has occurred within the past hour
     private void updateRank(String type) {
         // check when time of last update was
         db.collection("rankings").document(type).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
